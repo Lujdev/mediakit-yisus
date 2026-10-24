@@ -1,30 +1,87 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// Default metrics based on real data
-let metrics = {
-  instagram: {
-    followers: "12.1K",
-    views: "2M+",
-    newFollowers: "+1,610",
-  },
-  tiktok: {
-    followers: "14K",
-    views: "1.1M",
-    likes: "171.6K",
-  },
-};
+import { db, initDb } from "@/lib/db";
 
 export async function GET() {
-  return NextResponse.json(metrics);
+  try {
+    await initDb();
+    const result = await db.execute(
+      "SELECT platform, metric_type, value, label FROM metrics ORDER BY id"
+    );
+    
+    // Transform to structured object
+    const metrics: Record<string, Record<string, { value: string; label: string }>> = {};
+    
+    for (const row of result.rows) {
+      const platform = row.platform as string;
+      const metricType = row.metric_type as string;
+      
+      if (!metrics[platform]) metrics[platform] = {};
+      metrics[platform][metricType] = {
+        value: String(row.value),
+        label: String(row.label),
+      };
+    }
+    
+    return NextResponse.json(metrics);
+  } catch (error) {
+    console.error("GET metrics error:", error);
+    return NextResponse.json({ error: "Error al obtener métricas" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
   try {
+    await initDb();
     const body = await req.json();
-    if (body.instagram) metrics.instagram = { ...metrics.instagram, ...body.instagram };
-    if (body.tiktok) metrics.tiktok = { ...metrics.tiktok, ...body.tiktok };
-    return NextResponse.json({ success: true, metrics });
-  } catch {
-    return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+    
+    if (!body.platform || !body.metric_type || !body.value) {
+      return NextResponse.json(
+        { error: "platform, metric_type y value son requeridos" },
+        { status: 400 }
+      );
+    }
+    
+    // Update or insert
+    await db.execute({
+      sql: `INSERT INTO metrics (platform, metric_type, value, label) 
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(platform, metric_type) DO UPDATE SET
+            value = excluded.value,
+            label = excluded.label,
+            updated_at = CURRENT_TIMESTAMP`,
+      args: [body.platform, body.metric_type, body.value, body.label || body.metric_type],
+    });
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("POST metrics error:", error);
+    return NextResponse.json({ error: "Error al guardar métrica" }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    await initDb();
+    const body = await req.json();
+    
+    // Update multiple metrics at once
+    for (const [platform, metrics] of Object.entries(body)) {
+      for (const [metricType, data] of Object.entries(metrics as Record<string, { value: string; label?: string }>)) {
+        await db.execute({
+          sql: `INSERT INTO metrics (platform, metric_type, value, label) 
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(platform, metric_type) DO UPDATE SET
+                value = excluded.value,
+                label = COALESCE(excluded.label, metrics.label),
+                updated_at = CURRENT_TIMESTAMP`,
+          args: [platform, metricType, data.value, data.label || metricType],
+        });
+      }
+    }
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("PUT metrics error:", error);
+    return NextResponse.json({ error: "Error al actualizar métricas" }, { status: 500 });
   }
 }
