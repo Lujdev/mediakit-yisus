@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MediaKit Yisus Contreras
 
-## Getting Started
+MediaKit web interactivo y de alto impacto visual para **Yisus Contreras** (@yisus_contreras / @yisus_20).
 
-First, run the development server:
+## URL en vivo
+
+> Deployado en Vercel: [https://mediakit-yisus.vercel.app](https://mediakit-yisus.vercel.app)
+
+## Características
+
+- **Preloader cinematográfico** "YISUS" con glow neón animado
+- **Hero** con tipografía grande y gradiente lime → naranja
+- **Secciones:** Sobre mí, Métricas, Servicios, Marcas, Galería, Contacto
+- **Métricas animadas** con contadores que suben al hacer scroll
+- **Panel de administración** en `/admin` para editar métricas
+- **Formulario de contacto** conectado a API
+- **Diseño responsive** mobile-first
+
+## Stack Tecnológico
+
+| Capa | Tecnología |
+|------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Lenguaje | TypeScript |
+| Estilos | Tailwind CSS 3 |
+| Animaciones | Framer Motion |
+| Fuentes | Inter + Bebas Neue (Google Fonts) |
+| Email | Resend API |
+| Hosting | Vercel |
+
+## Paleta de Colores: "Neón Caracas"
+
+| Token | Hex | Uso |
+|-------|-----|-----|
+| Fondo principal | `#0A0A0A` | Background |
+| Fondo secundario | `#2A2A2A` | Cards |
+| Lima eléctrico | `#C8FF00` | Acentos, neón |
+| Naranja quemado | `#FF6B35` | CTAs |
+| Texto principal | `#F5F5F0` | Headings |
+| Texto secundario | `#A0A0A0` | Body |
+
+## Admin Panel
+
+- URL: `/admin`
+- Password: `yisus2026`
+- Funcionalidades: editar métricas de Instagram y TikTok
+
+## Scripts
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev      # Desarrollo local
+pnpm build    # Build de producción
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Estructura
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/
+├── page.tsx              # Landing principal
+├── layout.tsx            # Root layout + fuentes
+├── globals.css           # Tailwind + custom CSS
+├── sections/             # Secciones del site
+│   ├── Hero.tsx
+│   ├── About.tsx
+│   ├── Metrics.tsx
+│   ├── Services.tsx
+│   ├── Brands.tsx
+│   ├── Gallery.tsx
+│   └── Contact.tsx
+├── components/           # Componentes reutilizables
+│   ├── Preloader.tsx
+│   ├── Navigation.tsx
+│   └── InstagramIcon.tsx
+├── api/                  # API Routes
+│   ├── contact/route.ts
+│   └── metrics/route.ts
+└── admin/
+    └── page.tsx          # Panel de admin
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Creado por
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Yisus Contreras · Content Creator · Venezuela 🇻🇪
