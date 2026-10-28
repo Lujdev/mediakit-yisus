@@ -13,13 +13,23 @@ const STORAGE_KEY = "yisus-lang";
 const listeners = new Set<() => void>();
 let memoryLang: Lang | null = null;
 
+/** First language in the browser's preference list that the site supports (es or en); English otherwise. */
+function detectLang(): Lang {
+  const prefs = navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const raw of prefs) {
+    const code = raw?.toLowerCase().split("-")[0];
+    if (code === "es" || code === "en") return code;
+  }
+  return "en";
+}
+
 function readLang(): Lang {
   if (memoryLang) return memoryLang;
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === "es" || saved === "en") return saved;
   } catch {}
-  return navigator.language?.toLowerCase().startsWith("es") ? "es" : "en";
+  return detectLang();
 }
 
 function subscribe(cb: () => void) {
