@@ -17,6 +17,12 @@ export default function Tracker() {
       lang: navigator.language,
       tag: q.get("utm_source") || q.get("src") || q.get("ref"),
     });
+    // Tidy the address bar so a tagged link does not stay visible (or get re-shared with the tag).
+    if (q.has("utm_source") || q.has("src") || q.has("ref")) {
+      ["utm_source", "src", "ref"].forEach((k) => q.delete(k));
+      const clean = location.pathname + (q.toString() ? `?${q}` : "") + location.hash;
+      history.replaceState(null, "", clean);
+    }
     if (!navigator.sendBeacon?.("/api/track", new Blob([data], { type: "application/json" }))) {
       fetch("/api/track", { method: "POST", body: data, keepalive: true }).catch(() => {});
     }

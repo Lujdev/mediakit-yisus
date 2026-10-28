@@ -131,6 +131,15 @@ async function createSchema() {
   } catch {}
   await db.execute("CREATE INDEX IF NOT EXISTS idx_visits_created ON visits(created_at)");
 
+  // Short neutral links (/go/<code>) that tag a visit with the channel it came from.
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS channels (
+      code TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      display_order INTEGER NOT NULL DEFAULT 0
+    )
+  `);
+
   await db.execute(`
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
@@ -243,6 +252,18 @@ async function seed() {
           JSON.stringify(en[i].features),
           i,
         ],
+      });
+    }
+  });
+
+  await seedOnce("seed_channels_v1", async () => {
+    const names = ["Instagram", "TikTok", "WhatsApp"];
+    for (const [i, name] of names.entries()) {
+      // Random, meaningless codes so the link does not announce what it measures.
+      const code = Math.random().toString(36).slice(2, 7);
+      await db.execute({
+        sql: "INSERT OR IGNORE INTO channels (code, name, display_order) VALUES (?, ?, ?)",
+        args: [code, name, i],
       });
     }
   });

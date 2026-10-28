@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { AuthLostContext, Button, PanelHeader, json } from "../ui";
+import { AuthLostContext, Button, PanelHeader, StatusText, inputClass, json, useAdminRequest } from "../ui";
 
 type Row = { k: string; c: number };
 type Recent = {
@@ -76,21 +76,33 @@ function BarList({ title, rows, label }: { title: string; rows: Row[]; label?: (
   );
 }
 
-const CHANNEL_LINKS = [
-  { name: "Instagram", tag: "instagram", where: "bio de Instagram" },
-  { name: "TikTok", tag: "tiktok", where: "bio de TikTok" },
-  { name: "WhatsApp", tag: "whatsapp", where: "estado, catálogo o mensajes" },
-];
+type Channel = { code: string; name: string };
+const randomCode = () => Math.random().toString(36).slice(2, 7);
 
-/** Tagged links: the reliable way to know a visit came from a given social network. */
+/**
+ * Short neutral links (/go/<code>): the visitor lands on the clean home page and the origin is remembered
+ * server-side, so nothing about the tracking shows in the address bar.
+ */
 function ChannelLinks() {
+  const [rows, setRows] = useState<Channel[]>([]);
   const [copied, setCopied] = useState<string | null>(null);
+  const { state, run } = useAdminRequest();
   const origin = typeof window === "undefined" ? "" : window.location.origin;
 
-  const copy = async (tag: string) => {
+  useEffect(() => {
+    fetch("/api/channels", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setRows(d.channels))
+      .catch(() => {});
+  }, []);
+
+  const update = (i: number, patch: Partial<Channel>) =>
+    setRows((r) => r.map((row, idx) => (idx === i ? { ...row, ...patch } : row)));
+
+  const copy = async (code: string) => {
     try {
-      await navigator.clipboard.writeText(`${origin}/?utm_source=${tag}`);
-      setCopied(tag);
+      await navigator.clipboard.writeText(`${origin}/go/${code}`);
+      setCopied(code);
       setTimeout(() => setCopied(null), 2000);
     } catch {}
   };
@@ -103,25 +115,46 @@ function ChannelLinks() {
       </summary>
       <div className="space-y-4 pb-4 text-text-secondary">
         <p>
-          Instagram y TikTok no siempre avisan de dónde viene la gente, y WhatsApp casi nunca. Con un enlace etiquetado
-          lo sabemos seguro: pon cada uno en su red.
+          Instagram y TikTok no siempre avisan de dónde viene la gente, y WhatsApp casi nunca. Cada enlace de aquí es
+          corto y con un código neutro: quien lo abre cae en tu página sin ninguna etiqueta a la vista, y el panel
+          anota de qué red vino. Pon cada uno en su red.
         </p>
         <ul className="divide-y divide-line/10">
-          {CHANNEL_LINKS.map((c) => (
-            <li key={c.tag} className="flex flex-wrap items-center gap-3 py-3">
-              <div className="min-w-0 flex-1">
-                <p className="text-text-primary">{c.name} <span className="text-text-secondary">· {c.where}</span></p>
-                <p className="truncate font-mono text-xs">{origin}/?utm_source={c.tag}</p>
+          {rows.map((c, i) => (
+            <li key={i} className="space-y-2 py-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  aria-label="Nombre de la red o campaña"
+                  value={c.name}
+                  onChange={(e) => update(i, { name: e.target.value })}
+                  className={`${inputClass} max-w-[11rem]`}
+                />
+                <input
+                  aria-label="Código del enlace"
+                  value={c.code}
+                  onChange={(e) => update(i, { code: e.target.value.replace(/[^a-z0-9_-]/gi, "") })}
+                  className={`${inputClass} max-w-[8rem] font-mono`}
+                />
+                <Button variant="ghost" onClick={() => update(i, { code: randomCode() })}>Otro código</Button>
+                <Button variant="danger" onClick={() => setRows(rows.filter((_, idx) => idx !== i))}>Quitar</Button>
               </div>
-              <Button variant="ghost" onClick={() => copy(c.tag)}>{copied === c.tag ? "Copiado ✓" : "Copiar"}</Button>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="min-w-0 flex-1 truncate font-mono text-xs">{origin}/go/{c.code}</p>
+                <Button variant="ghost" onClick={() => copy(c.code)}>{copied === c.code ? "Copiado ✓" : "Copiar enlace"}</Button>
+              </div>
             </li>
           ))}
         </ul>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button variant="ghost" onClick={() => setRows([...rows, { code: randomCode(), name: "" }])}>+ Agregar red o campaña</Button>
+          <Button disabled={state.kind === "saving"} onClick={() => run("/api/channels", json("PUT", { channels: rows }))}>Guardar</Button>
+          <StatusText state={state} />
+        </div>
         <p>
-          <strong className="text-text-primary">Para probarlo:</strong> abre uno de estos enlaces en una ventana de
-          incógnito o desde otro teléfono (este dispositivo no cuenta si entras al admin desde él) y en unos segundos
-          verás la visita aparecer arriba con ese origen. Sin etiqueta, el panel igual detecta Google, YouTube, Facebook
-          y el navegador interno de Instagram, TikTok y Facebook.
+          <strong className="text-text-primary">Para probarlo:</strong> guarda, copia uno de los enlaces y ábrelo en
+          una ventana de incógnito o desde otro teléfono (este dispositivo no cuenta si entras al admin desde él).
+          Caerás en la página principal y en unos segundos verás la visita arriba con ese origen. Sin enlace, el panel
+          igual detecta Google, YouTube, Facebook y el navegador interno de Instagram, TikTok y Facebook.
         </p>
       </div>
     </details>
