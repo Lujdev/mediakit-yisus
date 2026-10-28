@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 import { useLang } from "../i18n/LanguageProvider";
 import { useSiteData } from "../data/SiteData";
 import LanguageToggle from "./LanguageToggle";
@@ -55,8 +56,8 @@ export default function Navigation() {
         }`}
       >
         <div className="flex h-14 items-center justify-between">
-          <a href="#hero" className="inline-flex h-11 items-center font-display text-2xl md:text-3xl text-accent-lime neon-glow cursor-pointer">
-            YISUS
+          <a href="#hero" aria-label="Yisus Contreras" className="inline-flex h-11 items-center cursor-pointer">
+            <Image src="/logo-yc.png" alt="" width={458} height={480} priority className="h-9 w-auto" />
           </a>
 
           <div className="hidden md:flex items-center gap-1">

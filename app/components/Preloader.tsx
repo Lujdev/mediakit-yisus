@@ -42,7 +42,8 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
           transition={{ duration: 0.9, ease }}
         >
           <div className="flex items-start justify-between font-mono text-[11px] tracking-[0.25em] uppercase text-text-secondary">
-            <span>Yisus Contreras</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-yc.png" alt="" width={458} height={480} className="h-10 w-auto md:h-14" />
             <span>MediaKit</span>
           </div>
 

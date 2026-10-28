@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import Preloader from "./components/Preloader";
 import Navigation from "./components/Navigation";
@@ -37,9 +38,7 @@ function HomeContent() {
       </main>
       <footer className="border-t border-white/5 py-8 px-4">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="font-display text-xl text-accent-lime neon-glow">
-            YISUS
-          </p>
+          <Image src="/logo-yc.png" alt="Yisus Contreras" width={458} height={480} className="h-14 w-auto" />
           <p className="text-text-secondary text-sm">
             © {new Date().getFullYear()} Yisus Contreras. {t.footer.rights}
           </p>

@@ -37,20 +37,6 @@ body {
   background: #D4F23A;
 }
 
-/* Neon glow utility */
-.neon-glow {
-  text-shadow:
-    0 0 12px rgba(212, 242, 58, 0.35),
-    0 0 32px rgba(212, 242, 58, 0.15);
-}
-
-.neon-glow-orange {
-  text-shadow: 
-    0 0 10px rgba(255, 122, 61, 0.5),
-    0 0 20px rgba(255, 122, 61, 0.3),
-    0 0 40px rgba(255, 122, 61, 0.2);
-}
-
 /* Glassmorphism */
 .glass {
   background: rgba(255, 255, 255, 0.03);
