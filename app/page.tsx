@@ -47,7 +47,20 @@ function HomeContent() {
           <p className="text-sm text-text-secondary">
             © {new Date().getFullYear()} Yisus Contreras. {t.footer.rights}
           </p>
-          <p className="text-sm text-text-secondary">{t.footer.madeWith}</p>
+          <div className="flex flex-col items-center gap-1 md:items-end">
+            <p className="text-sm text-text-secondary">{t.footer.madeWith}</p>
+            <a
+              href="https://www.instagram.com/luii.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest text-text-secondary transition-colors hover:text-accent-ink"
+            >
+              {t.footer.credit}
+              <span aria-hidden className="transition-transform group-hover:-translate-y-0.5">
+                ↗
+              </span>
+            </a>
+          </div>
         </div>
       </footer>
     </MotionConfig>

@@ -180,6 +180,7 @@ const es = {
   footer: {
     rights: "Todos los derechos reservados.",
     madeWith: "Hecho con actitud desde Venezuela",
+    credit: "© luii.dev — Luis Molina",
   },
 };
 
@@ -365,6 +366,7 @@ const en: Dict = {
   footer: {
     rights: "All rights reserved.",
     madeWith: "Made with attitude from Venezuela",
+    credit: "© luii.dev — Luis Molina",
   },
 };
 
