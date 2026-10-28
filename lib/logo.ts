@@ -3,21 +3,13 @@ import sharp from "sharp";
 const MAX_WIDTH = 480;
 
 /**
- * Turns a logo on a solid white background into a transparent PNG.
- * Recovers alpha from how far each pixel is from white, then un-premultiplies the
- * colour so anti-aliased edges stay clean. Logos that already have transparency pass through.
+ * Turns a logo on a (near-)white background into a transparent PNG.
+ * Always flattens onto white first, so logos with an opaque white interior (badges) lose it too.
+ * Then recovers alpha from how far each pixel is from white and un-premultiplies the colour so
+ * anti-aliased edges stay clean. Logos that are white-on-transparent are not supported.
  */
 export async function processLogo(input: Buffer): Promise<Buffer> {
-  const meta = await sharp(input).metadata();
-  const hasAlpha = Boolean(meta.hasAlpha);
-
-  const base = sharp(input).rotate().trim({ threshold: 14 });
-  if (hasAlpha) {
-    return base
-      .resize({ width: MAX_WIDTH, withoutEnlargement: true })
-      .png({ compressionLevel: 9 })
-      .toBuffer();
-  }
+  const base = sharp(input).rotate().flatten({ background: "#ffffff" }).trim({ threshold: 14 });
 
   const { data, info } = await base
     .resize({ width: MAX_WIDTH, withoutEnlargement: true })

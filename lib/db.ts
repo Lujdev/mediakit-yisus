@@ -19,6 +19,18 @@ export { db };
 
 export { DEFAULT_SETTINGS };
 
+// Each later batch is applied once to databases that already exist, tracked by a settings marker,
+// so brands the admin deleted later are not resurrected.
+const BRAND_BATCHES: { id: string; brands: { name: string; logo_url: string | null }[] }[] = [
+  {
+    id: "brands_v2",
+    brands: [
+      { name: "BACC", logo_url: "/brands/bacc.png" },
+      { name: "DERNIER", logo_url: "/brands/dernier.png" },
+    ],
+  },
+];
+
 const DEFAULT_BRANDS = [
   { name: "HERO", logo_url: "/brands/hero.png" },
   { name: "COVAS", logo_url: "/brands/covas.png" },
@@ -143,6 +155,21 @@ async function seed() {
         args: [b.name, b.logo_url, i],
       });
     }
+  }
+
+  for (const batch of BRAND_BATCHES) {
+    const done = await db.execute({ sql: "SELECT 1 FROM settings WHERE key = ?", args: [batch.id] });
+    if (done.rows.length > 0) continue;
+    for (const b of batch.brands) {
+      const exists = await db.execute({ sql: "SELECT 1 FROM brands WHERE name = ?", args: [b.name] });
+      if (exists.rows.length > 0) continue;
+      const order = await db.execute("SELECT COALESCE(MAX(display_order), -1) + 1 AS next FROM brands");
+      await db.execute({
+        sql: "INSERT INTO brands (name, logo_url, display_order) VALUES (?, ?, ?)",
+        args: [b.name, b.logo_url, Number(order.rows[0].next)],
+      });
+    }
+    await db.execute({ sql: "INSERT INTO settings (key, value) VALUES (?, '1')", args: [batch.id] });
   }
 
   const packages = await db.execute("SELECT COUNT(*) as count FROM packages");

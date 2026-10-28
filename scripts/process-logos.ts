@@ -7,6 +7,8 @@ const logos: Record<string, string> = {
   "logo_covas.png": "covas.png",
   "logo_rockstart.png": "rockstar.png",
   "samos_logo.webp": "samos.png",
+  "bacc_logo.webp": "bacc.png",
+  "logo_dernier.png": "dernier.png",
 };
 
 for (const [src, dest] of Object.entries(logos)) {

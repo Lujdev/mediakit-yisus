@@ -63,7 +63,10 @@ export async function getSiteData(): Promise<SiteData> {
     })),
     settings: {
       ...DEFAULT_SETTINGS,
-      ...Object.fromEntries(settings.rows.map((r) => [String(r.key), String(r.value)])),
+      // Only known keys: the table also holds internal seed markers.
+      ...Object.fromEntries(
+        settings.rows.filter((r) => String(r.key) in DEFAULT_SETTINGS).map((r) => [String(r.key), String(r.value)])
+      ),
     },
   };
 }
