@@ -1,0 +1,330 @@
+export type Lang = "es" | "en";
+
+const es = {
+  meta: {
+    title: "Yisus Contreras | Content Creator · Fashion · Lifestyle · Venezuela",
+    description:
+      "MediaKit de Yisus Contreras. Contenido real, estilo sin límites y creatividad con identidad. Colaboraciones con marcas en Venezuela y Latinoamérica.",
+  },
+  nav: {
+    aria: "Principal",
+    openMenu: "Abrir menú",
+    closeMenu: "Cerrar menú",
+    langLabel: "Cambiar idioma",
+    links: {
+      hero: "Inicio",
+      about: "Sobre mí",
+      metrics: "Métricas",
+      services: "Servicios",
+      brands: "Marcas",
+      gallery: "Galería",
+      contact: "Contacto",
+    },
+  },
+  preloader: "Cargando actitud...",
+  hero: {
+    badge: "Content Creator · Venezuela",
+    tagline: "Moda · Lifestyle · Storytelling · Contenido para marcas",
+    cta: "Trabajemos juntos",
+    ctaSecondary: "Conóceme",
+    scroll: "Scroll",
+    scrollAria: "Bajar a la siguiente sección",
+  },
+  about: {
+    eyebrow: "Sobre mí",
+    title: ["CREATIVIDAD", "CON IDENTIDAD"],
+    lead: "Soy Yisus, creador de contenido y storyteller visual. Mezclo estrategia, estilo y autenticidad para transformar ideas en piezas que conectan con audiencias y marcas.",
+    body: "Mi enfoque une moda, lifestyle y creatividad con una mirada fresca, visual y comercial. Me interesa que cada contenido se sienta real, tenga intención y represente bien a la marca sin perder personalidad. Trabajo desde la creatividad, el styling y la dirección visual para generar contenido con criterio estético, presencia digital y valor para colaboraciones.",
+    photoCaption: "Yisus C. — Venezuela",
+    pillars: [
+      { title: "Moda", desc: "Outfits que conectan y looks con personalidad propia." },
+      { title: "Lifestyle", desc: "Contenido real, momentos auténticos y vida cotidiana." },
+      { title: "Storytelling", desc: "Historias que se sienten, no solo se ven." },
+      { title: "Marcas", desc: "Colaboraciones estratégicas con resultados reales." },
+    ],
+  },
+  metrics: {
+    eyebrow: "Alcance real",
+    title: ["MÉTRICAS"],
+    description: "Audiencia que crece. Contenido que conecta. Resultados que se ven.",
+    labels: {} as Record<string, string>,
+  },
+  services: {
+    eyebrow: "Servicios",
+    title: ["TARIFAS"],
+    description:
+      "Paquetes base para empezar a trabajar juntos. También armamos propuestas personalizadas según tu objetivo.",
+    popular: "MÁS POPULAR",
+    cta: "Solicitar propuesta",
+    note: "Tarifas referenciales. Consulta propuestas personalizadas para campañas mayores.",
+    packages: [
+      {
+        name: "Combo #1",
+        price: "$300",
+        description: "Reel + TikTok + Ráfaga de 5 Stories",
+        features: [
+          "1 Reel profesional",
+          "1 Video TikTok",
+          "5 Stories con diseño",
+          "Edición con música tendencia",
+          "Entrega en 5 días",
+        ],
+      },
+      {
+        name: "Combo #2",
+        price: "$250",
+        description: "Carrusel + Ráfaga de 3 Stories",
+        features: [
+          "1 Carrusel de 5-10 slides",
+          "3 Stories con diseño",
+          "Copywriting incluido",
+          "Diseño alineado a tu marca",
+          "Entrega en 5 días",
+        ],
+      },
+      {
+        name: "Combo #3",
+        price: "$200",
+        description: "TikTok + Ráfaga de 3 Stories",
+        features: [
+          "1 Video TikTok",
+          "3 Stories con diseño",
+          "Edición dinámica",
+          "Concepto creativo",
+          "Entrega en 5 días",
+        ],
+      },
+    ],
+  },
+  brands: {
+    eyebrow: "Confían en mí",
+    title: ["MARCAS"],
+    description: "Colaboraciones que reflejan versatilidad, estilo y resultados.",
+  },
+  gallery: {
+    eyebrow: "Portafolio",
+    title: ["GALERÍA"],
+    description: "Un vistazo a mi mundo visual. Moda, lifestyle y momentos reales.",
+    close: "Cerrar",
+    viewLarge: "Ver en grande",
+    categories: {
+      Outfit: "Outfit",
+      Moda: "Moda",
+      Lifestyle: "Lifestyle",
+      Portrait: "Retrato",
+      Editorial: "Editorial",
+    } as Record<string, string>,
+  },
+  contact: {
+    eyebrow: "Hablemos",
+    title: ["TRABAJEMOS", "JUNTOS"],
+    description:
+      "Cuéntame tu marca, tu objetivo y tus fechas. Te respondo con una propuesta personalizada.",
+    name: "Nombre *",
+    namePh: "Tu nombre",
+    email: "Email *",
+    emailPh: "tu@email.com",
+    brand: "Marca / Empresa",
+    brandPh: "Nombre de tu marca",
+    service: "Tipo de servicio",
+    select: "Selecciona...",
+    services: {
+      "reel-tiktok": "Reel + TikTok",
+      carrusel: "Carrusel",
+      fotografia: "Fotografía",
+      "campaña": "Campaña completa",
+      otro: "Otro",
+    } as Record<string, string>,
+    message: "¿Qué quieres lograr? *",
+    messagePh: "Cuéntame tu objetivo, producto y fechas...",
+    submit: "Quiero mi propuesta",
+    sending: "Enviando...",
+    success: "¡Mensaje enviado! Te contactaré pronto.",
+    error: "Hubo un error. Intenta de nuevo o escríbeme por WhatsApp.",
+    contactTitle: "CONTACTO",
+    importantTitle: "Importante",
+    important: [
+      "Se mantiene mi lenguaje y estilo acordado.",
+      "Cada producto pasa por mi evaluación y aprobación personal.",
+      "Entrega aproximada: 5 días hábiles.",
+      "Formas de pago: Zelle, $, Cash, Pago móvil.",
+    ],
+  },
+  footer: {
+    rights: "Todos los derechos reservados.",
+    madeWith: "Hecho con actitud desde Venezuela",
+  },
+};
+
+export type Dict = typeof es;
+
+const en: Dict = {
+  meta: {
+    title: "Yisus Contreras | Content Creator · Fashion · Lifestyle · Venezuela",
+    description:
+      "Yisus Contreras' MediaKit. Real content, limitless style and creativity with identity. Brand collaborations in Venezuela and Latin America.",
+  },
+  nav: {
+    aria: "Main",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+    langLabel: "Change language",
+    links: {
+      hero: "Home",
+      about: "About",
+      metrics: "Metrics",
+      services: "Services",
+      brands: "Brands",
+      gallery: "Gallery",
+      contact: "Contact",
+    },
+  },
+  preloader: "Loading attitude...",
+  hero: {
+    badge: "Content Creator · Venezuela",
+    tagline: "Fashion · Lifestyle · Storytelling · Content for brands",
+    cta: "Let's work together",
+    ctaSecondary: "Meet me",
+    scroll: "Scroll",
+    scrollAria: "Scroll to the next section",
+  },
+  about: {
+    eyebrow: "About me",
+    title: ["CREATIVITY", "WITH IDENTITY"],
+    lead: "I'm Yisus, a content creator and visual storyteller. I blend strategy, style and authenticity to turn ideas into pieces that connect with audiences and brands.",
+    body: "My approach combines fashion, lifestyle and creativity with a fresh, visual and commercial eye. I care that every piece feels real, has intent and represents the brand without losing personality. I work from creativity, styling and visual direction to produce content with aesthetic judgment, digital presence and value for collaborations.",
+    photoCaption: "Yisus C. — Venezuela",
+    pillars: [
+      { title: "Fashion", desc: "Outfits that connect and looks with their own personality." },
+      { title: "Lifestyle", desc: "Real content, authentic moments and everyday life." },
+      { title: "Storytelling", desc: "Stories you feel, not just see." },
+      { title: "Brands", desc: "Strategic collaborations with real results." },
+    ],
+  },
+  metrics: {
+    eyebrow: "Real reach",
+    title: ["METRICS"],
+    description: "A growing audience. Content that connects. Results you can see.",
+    labels: {},
+  },
+  services: {
+    eyebrow: "Services",
+    title: ["RATES"],
+    description:
+      "Base packages to start working together. We also build custom proposals around your goal.",
+    popular: "MOST POPULAR",
+    cta: "Request a proposal",
+    note: "Reference rates. Ask for custom proposals for larger campaigns.",
+    packages: [
+      {
+        name: "Combo #1",
+        price: "$300",
+        description: "Reel + TikTok + Burst of 5 Stories",
+        features: [
+          "1 professional Reel",
+          "1 TikTok video",
+          "5 designed Stories",
+          "Editing with trending music",
+          "Delivery in 5 days",
+        ],
+      },
+      {
+        name: "Combo #2",
+        price: "$250",
+        description: "Carousel + Burst of 3 Stories",
+        features: [
+          "1 Carousel of 5-10 slides",
+          "3 designed Stories",
+          "Copywriting included",
+          "Design aligned with your brand",
+          "Delivery in 5 days",
+        ],
+      },
+      {
+        name: "Combo #3",
+        price: "$200",
+        description: "TikTok + Burst of 3 Stories",
+        features: [
+          "1 TikTok video",
+          "3 designed Stories",
+          "Dynamic editing",
+          "Creative concept",
+          "Delivery in 5 days",
+        ],
+      },
+    ],
+  },
+  brands: {
+    eyebrow: "They trust me",
+    title: ["BRANDS"],
+    description: "Collaborations that reflect versatility, style and results.",
+  },
+  gallery: {
+    eyebrow: "Portfolio",
+    title: ["GALLERY"],
+    description: "A glimpse into my visual world. Fashion, lifestyle and real moments.",
+    close: "Close",
+    viewLarge: "View larger",
+    categories: {
+      Outfit: "Outfit",
+      Moda: "Fashion",
+      Lifestyle: "Lifestyle",
+      Portrait: "Portrait",
+      Editorial: "Editorial",
+    },
+  },
+  contact: {
+    eyebrow: "Let's talk",
+    title: ["LET'S WORK", "TOGETHER"],
+    description:
+      "Tell me about your brand, your goal and your dates. I'll reply with a custom proposal.",
+    name: "Name *",
+    namePh: "Your name",
+    email: "Email *",
+    emailPh: "you@email.com",
+    brand: "Brand / Company",
+    brandPh: "Your brand name",
+    service: "Service type",
+    select: "Select...",
+    services: {
+      "reel-tiktok": "Reel + TikTok",
+      carrusel: "Carousel",
+      fotografia: "Photography",
+      "campaña": "Full campaign",
+      otro: "Other",
+    },
+    message: "What do you want to achieve? *",
+    messagePh: "Tell me your goal, product and dates...",
+    submit: "Get my proposal",
+    sending: "Sending...",
+    success: "Message sent! I'll get back to you soon.",
+    error: "Something went wrong. Try again or message me on WhatsApp.",
+    contactTitle: "CONTACT",
+    importantTitle: "Important",
+    important: [
+      "My agreed voice and style are kept.",
+      "Every product goes through my personal review and approval.",
+      "Estimated delivery: 5 business days.",
+      "Payment methods: Zelle, $, Cash, Pago móvil.",
+    ],
+  },
+  footer: {
+    rights: "All rights reserved.",
+    madeWith: "Made with attitude from Venezuela",
+  },
+};
+
+es.metrics.labels = {
+  followers: "Seguidores",
+  views: "Visualizaciones",
+  new_followers: "Nuevos seguidores",
+  likes: "Me gusta",
+};
+en.metrics.labels = {
+  followers: "Followers",
+  views: "Views",
+  new_followers: "New followers",
+  likes: "Likes",
+};
+
+export const dictionary: Record<Lang, Dict> = { es, en };
