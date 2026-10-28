@@ -1,18 +1,21 @@
 "use client";
 
+import { useLang } from "../i18n/LanguageProvider";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
 const letters = ["Y", "I", "S", "U", "S"];
 
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
+  const { t } = useLang();
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
       setTimeout(onComplete, 600);
-    }, 2800);
+    }, 1800);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
@@ -20,7 +23,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: 0.15,
+        staggerChildren: 0.1,
       },
     },
     exit: {
@@ -64,7 +67,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
                         scale: [1, 1.05, 1],
                         opacity: [1, 0.85, 1, 0.9, 1],
                         transition: {
-                          delay: 0.15 * letters.length + 0.2,
+                          delay: 0.1 * letters.length + 0.1,
                           duration: 0.4,
                           times: [0, 0.3, 0.5, 0.7, 1],
                         },
@@ -79,10 +82,10 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
           <motion.div
             className="absolute bottom-12 left-1/2 -translate-x-1/2"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { delay: 1.2 } }}
+            animate={{ opacity: 1, transition: { delay: 0.6 } }}
           >
             <p className="text-text-secondary text-sm tracking-[0.3em] uppercase">
-              Cargando actitud...
+              {t.preloader}
             </p>
           </motion.div>
         </motion.div>

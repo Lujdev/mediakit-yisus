@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "../i18n/LanguageProvider";
+import SectionHeader from "../components/SectionHeader";
 import { motion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Users, Eye, Heart } from "lucide-react";
@@ -54,6 +56,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; size?: n
 };
 
 export default function Metrics() {
+  const { t } = useLang();
   const [metrics, setMetrics] = useState<MetricsData>({});
   const [loading, setLoading] = useState(true);
 
@@ -107,7 +110,7 @@ export default function Metrics() {
                     <AnimatedCounter value={parseValue(metric.value)} />
                   )}
                 </div>
-                <p className="text-text-secondary text-sm">{metric.label}</p>
+                <p className="text-text-secondary text-sm">{t.metrics.labels[key] ?? metric.label}</p>
               </motion.div>
             );
           })}
@@ -117,25 +120,15 @@ export default function Metrics() {
   };
 
   return (
-    <section id="metrics" className="relative py-24 md:py-32 px-4">
+    <section id="metrics" className="relative py-16 md:py-36 px-4">
       <div className="mx-auto max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <p className="text-accent-lime text-sm tracking-[0.3em] uppercase mb-4">
-            Alcance real
-          </p>
-          <h2 className="font-display text-5xl md:text-7xl text-text-primary mb-4">
-            MÉTRICAS
-          </h2>
-          <p className="text-text-secondary max-w-xl mx-auto">
-            Audiencia que crece. Contenido que conecta. Resultados que se ven.
-          </p>
-        </motion.div>
+        <SectionHeader
+          index="02"
+          eyebrow={t.metrics.eyebrow}
+          title={t.metrics.title}
+          accentLine={0}
+          description={t.metrics.description}
+        />
 
         {renderPlatform(
           "instagram",

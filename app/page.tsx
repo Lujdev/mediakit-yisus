@@ -10,12 +10,17 @@ import Services from "./sections/Services";
 import Brands from "./sections/Brands";
 import Gallery from "./sections/Gallery";
 import Contact from "./sections/Contact";
+import { LanguageProvider, useLang } from "./i18n/LanguageProvider";
+import Ambient from "./components/Ambient";
+import { MotionConfig } from "framer-motion";
 
-export default function Home() {
+function HomeContent() {
+  const { t } = useLang();
   const [loading, setLoading] = useState(true);
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
+      <Ambient />
       {loading && <Preloader onComplete={() => setLoading(false)} />}
       <Navigation />
       <main>
@@ -33,14 +38,21 @@ export default function Home() {
             YISUS
           </p>
           <p className="text-text-secondary text-sm">
-            © {new Date().getFullYear()} Yisus Contreras. Todos los derechos
-            reservados.
+            © {new Date().getFullYear()} Yisus Contreras. {t.footer.rights}
           </p>
           <p className="text-text-secondary text-sm">
-            Hecho con actitud desde Venezuela 🇻🇪
+            {t.footer.madeWith}
           </p>
         </div>
       </footer>
-    </>
+    </MotionConfig>
+  );
+}
+
+export default function Home() {
+  return (
+    <LanguageProvider>
+      <HomeContent />
+    </LanguageProvider>
   );
 }

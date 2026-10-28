@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "../i18n/LanguageProvider";
+import SectionHeader from "../components/SectionHeader";
 import { motion } from "framer-motion";
 import { Mail, MessageCircle, Phone, Send } from "lucide-react";
 import { useState } from "react";
@@ -29,6 +31,7 @@ const socialLinks = [
 ];
 
 export default function Contact() {
+  const { t } = useLang();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -59,28 +62,15 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="relative py-24 md:py-32 px-4">
+    <section id="contact" className="relative py-16 md:py-36 px-4">
       <div className="mx-auto max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <p className="text-accent-lime text-sm tracking-[0.3em] uppercase mb-4">
-            Hablemos
-          </p>
-          <h2 className="font-display text-5xl md:text-7xl text-text-primary mb-4">
-            TRABAJEMOS
-            <br />
-            <span className="gradient-text">JUNTOS</span>
-          </h2>
-          <p className="text-text-secondary max-w-xl mx-auto">
-            Cuéntame tu marca, tu objetivo y tus fechas. Te respondo con una
-            propuesta personalizada.
-          </p>
-        </motion.div>
+        <SectionHeader
+          index="06"
+          eyebrow={t.contact.eyebrow}
+          title={t.contact.title}
+          accentLine={1}
+          description={t.contact.description}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           {/* Form */}
@@ -93,23 +83,23 @@ export default function Contact() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-text-secondary text-sm mb-2">
-                    Nombre *
+                  <label htmlFor="f-name" className="block text-text-secondary text-sm mb-2">
+                    {t.contact.name}
                   </label>
-                  <input
+                  <input id="f-name" name="name"
                     type="text"
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full bg-bg-secondary border border-white/10 rounded-xl px-4 py-3 text-text-primary focus:border-accent-lime focus:outline-none transition-colors"
-                    placeholder="Tu nombre"
+                    placeholder={t.contact.namePh}
                   />
                 </div>
                 <div>
-                  <label className="block text-text-secondary text-sm mb-2">
-                    Email *
+                  <label htmlFor="f-email" className="block text-text-secondary text-sm mb-2">
+                    {t.contact.email}
                   </label>
-                  <input
+                  <input id="f-email" name="email"
                     type="email"
                     required
                     value={form.email}
@@ -117,52 +107,52 @@ export default function Contact() {
                       setForm({ ...form, email: e.target.value })
                     }
                     className="w-full bg-bg-secondary border border-white/10 rounded-xl px-4 py-3 text-text-primary focus:border-accent-lime focus:outline-none transition-colors"
-                    placeholder="tu@email.com"
+                    placeholder={t.contact.emailPh}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-text-secondary text-sm mb-2">
-                    Marca / Empresa
+                  <label htmlFor="f-brand" className="block text-text-secondary text-sm mb-2">
+                    {t.contact.brand}
                   </label>
-                  <input
+                  <input id="f-brand" name="brand"
                     type="text"
                     value={form.brand}
                     onChange={(e) =>
                       setForm({ ...form, brand: e.target.value })
                     }
                     className="w-full bg-bg-secondary border border-white/10 rounded-xl px-4 py-3 text-text-primary focus:border-accent-lime focus:outline-none transition-colors"
-                    placeholder="Nombre de tu marca"
+                    placeholder={t.contact.brandPh}
                   />
                 </div>
                 <div>
-                  <label className="block text-text-secondary text-sm mb-2">
-                    Tipo de servicio
+                  <label htmlFor="f-service" className="block text-text-secondary text-sm mb-2">
+                    {t.contact.service}
                   </label>
-                  <select
+                  <select id="f-service" name="service"
                     value={form.service}
                     onChange={(e) =>
                       setForm({ ...form, service: e.target.value })
                     }
                     className="w-full bg-bg-secondary border border-white/10 rounded-xl px-4 py-3 text-text-primary focus:border-accent-lime focus:outline-none transition-colors"
                   >
-                    <option value="">Selecciona...</option>
-                    <option value="reel-tiktok">Reel + TikTok</option>
-                    <option value="carrusel">Carrusel</option>
-                    <option value="fotografia">Fotografía</option>
-                    <option value="campaña">Campaña completa</option>
-                    <option value="otro">Otro</option>
+                    <option value="">{t.contact.select}</option>
+                    {Object.entries(t.contact.services).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-text-secondary text-sm mb-2">
-                  ¿Qué quieres lograr? *
+                <label htmlFor="f-message" className="block text-text-secondary text-sm mb-2">
+                  {t.contact.message}
                 </label>
-                <textarea
+                <textarea id="f-message" name="message"
                   required
                   rows={5}
                   value={form.message}
@@ -170,7 +160,7 @@ export default function Contact() {
                     setForm({ ...form, message: e.target.value })
                   }
                   className="w-full bg-bg-secondary border border-white/10 rounded-xl px-4 py-3 text-text-primary focus:border-accent-lime focus:outline-none transition-colors resize-none"
-                  placeholder="Cuéntame tu objetivo, producto y fechas..."
+                  placeholder={t.contact.messagePh}
                 />
               </div>
 
@@ -181,18 +171,18 @@ export default function Contact() {
               >
                 <Send size={18} />
                 {status === "sending"
-                  ? "Enviando..."
-                  : "Quiero mi propuesta"}
+                  ? t.contact.sending
+                  : t.contact.submit}
               </button>
 
               {status === "success" && (
                 <p className="text-accent-lime text-sm">
-                  ¡Mensaje enviado! Te contactaré pronto.
+                  {t.contact.success}
                 </p>
               )}
               {status === "error" && (
                 <p className="text-red-400 text-sm">
-                  Hubo un error. Intenta de nuevo o escríbeme por WhatsApp.
+                  {t.contact.error}
                 </p>
               )}
             </form>
@@ -208,7 +198,7 @@ export default function Contact() {
           >
             <div>
               <h3 className="font-display text-2xl text-text-primary mb-6">
-                CONTACTO
+                {t.contact.contactTitle}
               </h3>
               <div className="space-y-4">
                 {socialLinks.map((link) => (
@@ -233,15 +223,12 @@ export default function Contact() {
 
             <div className="glass rounded-xl p-6">
               <h4 className="font-semibold text-text-primary mb-3">
-                Importante
+                {t.contact.importantTitle}
               </h4>
               <ul className="space-y-2 text-text-secondary text-sm">
-                <li>• Se mantiene mi lenguaje y estilo acordado.</li>
-                <li>
-                  • Cada producto pasa por mi evaluación y aprobación personal.
-                </li>
-                <li>• Entrega aproximada: 5 días hábiles.</li>
-                <li>• Formas de pago: Zelle, $, Cash, Pago móvil.</li>
+                {t.contact.important.map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
               </ul>
             </div>
           </motion.div>

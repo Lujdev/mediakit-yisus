@@ -1,8 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLang } from "../i18n/LanguageProvider";
+import Reveal from "../components/Reveal";
+import SectionHeader from "../components/SectionHeader";
 
 const images = [
   { src: "/images/1.jpeg", alt: "Yisus estilo urbano", category: "Outfit" },
@@ -16,85 +20,95 @@ const images = [
 ];
 
 export default function Gallery() {
-  const [selected, setSelected] = useState<string | null>(null);
+  const { t } = useLang();
+  const [selected, setSelected] = useState<(typeof images)[number] | null>(null);
+
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setSelected(null);
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [selected]);
 
   return (
-    <section id="gallery" className="relative py-24 md:py-32 px-4">
+    <section id="gallery" className="relative py-16 md:py-36 px-4">
       <div className="mx-auto max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <p className="text-accent-lime text-sm tracking-[0.3em] uppercase mb-4">
-            Portafolio
-          </p>
-          <h2 className="font-display text-5xl md:text-7xl text-text-primary mb-4">
-            GALERÍA
-          </h2>
-          <p className="text-text-secondary max-w-xl mx-auto">
-            Un vistazo a mi mundo visual. Moda, lifestyle y momentos reales.
-          </p>
-        </motion.div>
+        <SectionHeader
+          index="05"
+          eyebrow={t.gallery.eyebrow}
+          title={t.gallery.title}
+          accentLine={0}
+          description={t.gallery.description}
+        />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px] md:auto-rows-[250px]">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[260px]">
           {images.map((img, i) => (
-            <motion.div
+            <Reveal
               key={img.src}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
-              className={`relative rounded-xl overflow-hidden cursor-pointer group ${
-                i === 0 || i === 5 ? "md:col-span-2 md:row-span-2" : ""
-              }`}
-              onClick={() => setSelected(img.src)}
+              delay={(i % 4) * 0.07}
+              className={i === 0 || i === 5 ? "md:col-span-2 md:row-span-2" : ""}
             >
-              <Image
-                src={img.src}
-                alt={img.alt}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                <span className="text-accent-lime text-xs tracking-wider uppercase">
-                  {img.category}
+              <button
+                type="button"
+                onClick={() => setSelected(img)}
+                aria-label={`${t.gallery.viewLarge}: ${img.alt}`}
+                className="relative block h-full w-full rounded-2xl overflow-hidden cursor-pointer group"
+              >
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  sizes={i === 0 || i === 5 ? "(max-width: 768px) 50vw, 50vw" : "(max-width: 768px) 50vw, 25vw"}
+                  className="object-cover grayscale-[40%] transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/85 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-accent-lime/60 transition-all duration-300" />
+                <span className="absolute bottom-4 left-4 font-mono text-xs tracking-widest uppercase text-accent-lime translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                  {t.gallery.categories[img.category] ?? img.category}
                 </span>
-              </div>
-            </motion.div>
+              </button>
+            </Reveal>
           ))}
         </div>
       </div>
 
-      {/* Lightbox */}
-      {selected && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-bg-primary/95 flex items-center justify-center p-4"
-          onClick={() => setSelected(null)}
-        >
-          <div className="relative w-full max-w-4xl aspect-[3/4] md:aspect-[4/5]">
-            <Image
-              src={selected}
-              alt="Gallery preview"
-              fill
-              className="object-contain"
-            />
-          </div>
-          <button
-            className="absolute top-6 right-6 text-text-primary hover:text-accent-lime transition-colors"
+      <AnimatePresence>
+        {selected && (
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={selected.alt}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[70] bg-bg-primary/95 backdrop-blur-md flex items-center justify-center p-4"
             onClick={() => setSelected(null)}
           >
-            Cerrar
-          </button>
-        </motion.div>
-      )}
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="relative w-full max-w-4xl aspect-[3/4] md:aspect-[4/5] max-h-[90svh]"
+            >
+              <Image src={selected.src} alt={selected.alt} fill sizes="90vw" className="object-contain" />
+            </motion.div>
+            <button
+              type="button"
+              aria-label={t.gallery.close}
+              className="absolute top-5 right-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-text-primary hover:border-accent-lime hover:text-accent-lime transition-colors cursor-pointer"
+              onClick={() => setSelected(null)}
+            >
+              <X size={22} aria-hidden />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

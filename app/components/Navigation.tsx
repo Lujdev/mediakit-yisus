@@ -3,84 +3,114 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { useLang } from "../i18n/LanguageProvider";
+import LanguageToggle from "./LanguageToggle";
 
-const navLinks = [
-  { label: "Inicio", href: "#hero" },
-  { label: "Sobre mí", href: "#about" },
-  { label: "Métricas", href: "#metrics" },
-  { label: "Servicios", href: "#services" },
-  { label: "Marcas", href: "#brands" },
-  { label: "Galería", href: "#gallery" },
-  { label: "Contacto", href: "#contact" },
-];
+const sections = ["hero", "about", "metrics", "services", "brands", "gallery", "contact"] as const;
 
 export default function Navigation() {
+  const { t } = useLang();
+  const navLinks = sections.map((id) => ({ label: t.nav.links[id], href: `#${id}` }));
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [active, setActive] = useState("#hero");
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => e.isIntersecting && setActive(`#${e.target.id}`));
+      },
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
   }, []);
 
   return (
     <motion.nav
+      aria-label={t.nav.aria}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-        scrolled
-          ? "bg-bg-primary/80 backdrop-blur-md border-b border-white/5"
-          : "bg-transparent"
-      }`}
+      className="fixed top-0 left-0 right-0 z-40 px-3 pt-3 md:pt-5"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 md:h-20 items-center justify-between">
-          <a href="#hero" className="font-display text-2xl md:text-3xl text-accent-lime neon-glow">
+      <div
+        className={`mx-auto max-w-5xl rounded-full px-5 transition-all duration-300 ${
+          scrolled ? "bg-bg-primary/70 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/40" : "border border-transparent"
+        }`}
+      >
+        <div className="flex h-14 items-center justify-between">
+          <a href="#hero" className="inline-flex h-11 items-center font-display text-2xl md:text-3xl text-accent-lime neon-glow cursor-pointer">
             YISUS
           </a>
 
-          {/* Desktop */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-sm text-text-secondary hover:text-accent-lime transition-colors duration-200 tracking-wide"
-              >
-                {link.label}
-              </a>
-            ))}
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive = active === link.href;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "true" : undefined}
+                  className={`relative px-3 py-2 text-sm tracking-wide rounded-full transition-colors duration-200 cursor-pointer ${
+                    isActive ? "text-bg-primary" : "text-text-secondary hover:text-accent-lime"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-pill"
+                      className="absolute inset-0 rounded-full bg-accent-lime"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative">{link.label}</span>
+                </a>
+              );
+            })}
+            <LanguageToggle className="ml-3" />
           </div>
 
-          {/* Mobile toggle */}
+          <div className="md:hidden flex items-center gap-1">
+          <LanguageToggle />
           <button
-            className="md:hidden text-text-primary"
+            className="flex h-11 w-11 items-center justify-center text-text-primary cursor-pointer"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
+            aria-label={mobileOpen ? t.nav.closeMenu : t.nav.openMenu}
+            aria-expanded={mobileOpen}
           >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileOpen ? <X size={24} aria-hidden /> : <Menu size={24} aria-hidden />}
           </button>
+          </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-bg-primary/95 backdrop-blur-md border-b border-white/5"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="md:hidden mt-2 mx-auto max-w-5xl rounded-3xl bg-bg-primary/95 backdrop-blur-xl border border-white/10"
           >
-            <div className="px-4 py-6 space-y-4">
+            <div className="px-6 py-6 space-y-1">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block text-lg text-text-secondary hover:text-accent-lime transition-colors"
+                  className={`block py-3 font-display text-3xl tracking-wide transition-colors cursor-pointer ${
+                    active === link.href ? "text-accent-lime" : "text-text-secondary hover:text-accent-lime"
+                  }`}
                 >
                   {link.label}
                 </a>

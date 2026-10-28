@@ -1,103 +1,95 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
+import { useRef } from "react";
 import { Shirt, Palmtree, Clapperboard, Briefcase } from "lucide-react";
+import { useLang } from "../i18n/LanguageProvider";
+import Reveal from "../components/Reveal";
+import SectionHeader from "../components/SectionHeader";
+import SpotlightCard from "../components/SpotlightCard";
 
-const pillars = [
-  {
-    icon: Shirt,
-    title: "Moda",
-    desc: "Outfits que conectan y looks con personalidad propia.",
-  },
-  {
-    icon: Palmtree,
-    title: "Lifestyle",
-    desc: "Contenido real, momentos auténticos y vida cotidiana.",
-  },
-  {
-    icon: Clapperboard,
-    title: "Storytelling",
-    desc: "Historias que se sienten, no solo se ven.",
-  },
-  {
-    icon: Briefcase,
-    title: "Marcas",
-    desc: "Colaboraciones estratégicas con resultados reales.",
-  },
-];
+const pillarIcons = [Shirt, Palmtree, Clapperboard, Briefcase];
 
 export default function About() {
+  const { t } = useLang();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const imgY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
+  const frameRotate = useTransform(scrollYProgress, [0, 1], [-3, 3]);
+
   return (
-    <section id="about" className="relative py-24 md:py-32 px-4">
+    <section id="about" className="relative py-16 md:py-36 px-4">
       <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Image */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7 }}
-            className="relative aspect-[4/5] rounded-2xl overflow-hidden"
-          >
-            <Image
-              src="/images/1.jpeg"
-              alt="Yisus Contreras"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/60 to-transparent" />
-          </motion.div>
+          <div ref={ref} className="lg:col-span-5 lg:sticky lg:top-28">
+            <div className="relative">
+              <motion.div
+                aria-hidden
+                style={{ rotate: frameRotate }}
+                className="absolute inset-0 rounded-3xl border border-accent-lime/40 translate-x-4 translate-y-4"
+              />
+              <Reveal y={50}>
+                <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-bg-secondary">
+                  <motion.div style={{ y: imgY }} className="absolute -inset-[10%]">
+                    <Image
+                      src="/images/1.jpeg"
+                      alt="Yisus Contreras"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 40vw"
+                      className="object-cover"
+                    />
+                  </motion.div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 via-transparent to-transparent" />
+                  <p className="absolute bottom-5 left-5 font-mono text-xs tracking-widest uppercase text-text-primary/80">
+                    {t.about.photoCaption}
+                  </p>
+                </div>
+              </Reveal>
+            </div>
+          </div>
 
           {/* Text */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7 }}
-          >
-            <p className="text-accent-lime text-sm tracking-[0.3em] uppercase mb-4">
-              Sobre mí
-            </p>
-            <h2 className="font-display text-5xl md:text-7xl text-text-primary mb-6">
-              CREATIVIDAD
-              <br />
-              <span className="gradient-text">CON IDENTIDAD</span>
-            </h2>
-            <p className="text-text-secondary text-lg leading-relaxed mb-6">
-              Soy Yisus, creador de contenido y storyteller visual. Mezclo
-              estrategia, estilo y autenticidad para transformar ideas en piezas
-              que conectan con audiencias y marcas.
-            </p>
-            <p className="text-text-secondary leading-relaxed mb-10">
-              Mi enfoque une moda, lifestyle y creatividad con una mirada fresca,
-              visual y comercial. Me interesa que cada contenido se sienta real,
-              tenga intención y represente bien a la marca sin perder
-              personalidad. Trabajo desde la creatividad, el styling y la
-              dirección visual para generar contenido con criterio estético,
-              presencia digital y valor para colaboraciones.
-            </p>
+          <div className="lg:col-span-7 lg:pl-8">
+            <SectionHeader
+              index="01"
+              eyebrow={t.about.eyebrow}
+              title={t.about.title}
+              accentLine={1}
+            />
+            <Reveal>
+              <p className="text-text-primary text-xl md:text-2xl leading-snug mb-6 font-medium">
+                {t.about.lead}
+              </p>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="text-text-secondary leading-relaxed mb-12 max-w-2xl">
+                {t.about.body}
+              </p>
+            </Reveal>
 
-            {/* Pillars */}
-            <div className="grid grid-cols-2 gap-4">
-              {pillars.map((pillar, i) => (
-                <motion.div
-                  key={pillar.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="glass rounded-xl p-4 hover:border-accent-lime/30 transition-colors"
-                >
-                  <pillar.icon className="text-accent-lime mb-2" size={24} />
-                  <h3 className="font-semibold text-text-primary mb-1">
-                    {pillar.title}
-                  </h3>
-                  <p className="text-text-secondary text-sm">{pillar.desc}</p>
-                </motion.div>
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {t.about.pillars.map((pillar, i) => {
+                const Icon = pillarIcons[i];
+                return (
+                <Reveal key={pillar.title} delay={i * 0.08}>
+                  <SpotlightCard className="glass rounded-2xl p-6 h-full hover:border-accent-lime/30 transition-colors duration-300 group">
+                    <Icon
+                      className="text-accent-lime mb-4 transition-transform duration-300 group-hover:-translate-y-1 group-hover:rotate-6"
+                      size={28}
+                      aria-hidden
+                    />
+                    <h3 className="font-display text-2xl tracking-wide text-text-primary mb-1">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-text-secondary text-sm">{pillar.desc}</p>
+                  </SpotlightCard>
+                </Reveal>
+                );
+              })}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

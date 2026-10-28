@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, Bebas_Neue } from "next/font/google";
+import { Space_Grotesk, Space_Mono, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const grotesk = Space_Grotesk({
+  variable: "--font-grotesk",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const mono = Space_Mono({
+  variable: "--font-mono",
+  weight: ["400", "700"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -42,7 +49,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${bebasNeue.variable} h-full antialiased`}
+      className={`${grotesk.variable} ${mono.variable} ${bebasNeue.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg-primary text-text-primary">
         {children}

@@ -15,7 +15,8 @@ module.exports = {
         "text-secondary": "#A0A0A0",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans: ["var(--font-grotesk)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
         display: ["var(--font-bebas-neue)", "system-ui", "sans-serif"],
       },
     },
