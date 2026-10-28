@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { useLang } from "../i18n/LanguageProvider";
 import { useSiteData } from "../data/SiteData";
 import LanguageToggle from "./LanguageToggle";
+import { SocialLinks } from "./SocialIcons";
 
 const ALL_SECTIONS = ["hero", "about", "metrics", "services", "brands", "gallery", "videos", "contact"] as const;
 
@@ -81,10 +82,12 @@ export default function Navigation() {
                 </a>
               );
             })}
-            <LanguageToggle className="ml-3" />
+            <SocialLinks className="ml-2" />
+            <LanguageToggle className="ml-1" />
           </div>
 
           <div className="md:hidden flex items-center gap-1">
+          <SocialLinks size={18} />
           <LanguageToggle />
           <button
             className="flex h-11 w-11 items-center justify-center text-text-primary cursor-pointer"
