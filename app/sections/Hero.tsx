@@ -38,14 +38,6 @@ export default function Hero() {
       </motion.div>
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-bg-primary/70 via-bg-primary/30 to-bg-primary" />
 
-      {/* Aurora */}
-      <div aria-hidden className="aurora -top-20 -left-24 h-96 w-96 bg-accent-lime/40" />
-      <div
-        aria-hidden
-        className="aurora -bottom-24 -right-16 h-[28rem] w-[28rem] bg-accent-orange/40"
-        style={{ animationDelay: "-6s" }}
-      />
-
       {/* Content */}
       <motion.div
         style={{ y: titleY, opacity: fade }}
@@ -66,7 +58,7 @@ export default function Hero() {
           {["YISUS", "CONTRERAS"].map((word, i) => (
             <span key={word} className="block overflow-hidden pb-[0.05em]">
               <motion.span
-                className={`block ${i === 1 ? "gradient-text" : "text-text-primary"}`}
+                className={`block ${i === 1 ? "text-accent-lime" : "text-text-primary"}`}
                 initial={{ y: "110%", rotate: 2 }}
                 animate={{ y: 0, rotate: 0 }}
                 transition={{ duration: 1, delay: 0.35 + i * 0.15, ease }}

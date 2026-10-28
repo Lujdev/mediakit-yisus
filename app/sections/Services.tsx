@@ -1,11 +1,10 @@
 "use client";
 
-import { Check, Star } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useLang } from "../i18n/LanguageProvider";
 import { useSiteData } from "../data/SiteData";
 import Reveal from "../components/Reveal";
 import SectionHeader from "../components/SectionHeader";
-import SpotlightCard from "../components/SpotlightCard";
 
 export default function Services() {
   const { t, lang } = useLang();
@@ -19,10 +18,10 @@ export default function Services() {
         features: p.features[lang],
       }))
     : t.services.packages.map((p, i) => ({ ...p, popular: i === 0 }));
+
   return (
-    <section id="services" className="relative py-16 md:py-36 px-4 overflow-hidden">
-      <div aria-hidden className="aurora top-1/3 -right-32 h-96 w-96 bg-accent-orange/30" />
-      <div className="relative mx-auto max-w-7xl">
+    <section id="services" className="relative py-16 md:py-36 px-4">
+      <div className="mx-auto max-w-7xl">
         <SectionHeader
           index="03"
           eyebrow={t.services.eyebrow}
@@ -31,64 +30,60 @@ export default function Services() {
           description={t.services.description}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
-          {packages.map((pkg, i) => {
-            const popular = pkg.popular;
-            return (
-            <Reveal key={pkg.name} delay={i * 0.12} className="h-full">
-              <SpotlightCard
-                className={`h-full rounded-3xl p-8 transition-transform duration-300 hover:-translate-y-2 ${
-                  popular
-                    ? "shimmer-border bg-bg-secondary/60 backdrop-blur"
-                    : "glass hover:border-accent-lime/30"
-                }`}
-              >
-                {popular && (
-                  <div className="absolute top-5 right-5 bg-accent-orange text-bg-primary text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                    <Star size={12} fill="currentColor" aria-hidden />
-                    {t.services.popular}
+        {/* Price list: one ruled row per package, price as the loudest element. */}
+        <ul className="border-b border-white/10">
+          {packages.map((pkg, i) => (
+            <Reveal key={pkg.name} delay={i * 0.08}>
+              <li className="grid gap-x-10 gap-y-6 border-t border-white/10 py-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] md:items-start md:py-12">
+                <div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h3 className="font-display text-4xl md:text-5xl leading-none tracking-wide text-text-primary">
+                      {pkg.name}
+                    </h3>
+                    {pkg.popular && (
+                      <span className="bg-accent-orange px-2 py-1 font-mono text-[11px] tracking-widest uppercase text-bg-primary">
+                        {t.services.popular}
+                      </span>
+                    )}
                   </div>
-                )}
-
-                <h3 className="font-display text-3xl tracking-wide text-text-primary mb-2">
-                  {pkg.name}
-                </h3>
-                <p className="text-text-secondary text-sm mb-8 min-h-10">{pkg.description}</p>
-
-                <div className="font-display text-7xl text-accent-lime mb-8 leading-none">
-                  {pkg.price}
-                  <span className="ml-2 font-mono text-xs tracking-widest text-text-secondary">USD</span>
+                  <p className="mt-3 max-w-sm text-text-secondary">{pkg.description}</p>
                 </div>
 
-                <ul className="space-y-3 mb-10">
+                <ul className="space-y-2 text-sm md:text-base text-text-secondary">
                   {pkg.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3 text-text-secondary text-sm">
-                      <Check className="text-accent-lime shrink-0 mt-0.5" size={16} aria-hidden />
+                    <li key={feature} className="flex gap-3">
+                      <span aria-hidden className="text-accent-lime">
+                        —
+                      </span>
                       {feature}
                     </li>
                   ))}
                 </ul>
 
-                <a
-                  href="#contact"
-                  className={`block w-full text-center py-3.5 rounded-full font-semibold transition-colors duration-300 cursor-pointer ${
-                    popular
-                      ? "bg-accent-lime text-bg-primary hover:bg-accent-orange"
-                      : "bg-white/10 text-text-primary hover:bg-accent-lime hover:text-bg-primary"
-                  }`}
-                >
-                  {t.services.cta}
-                </a>
-              </SpotlightCard>
+                <div className="flex items-end justify-between gap-4 md:flex-col md:items-end md:justify-start md:gap-6">
+                  <p
+                    className={`font-display text-7xl md:text-8xl leading-none ${
+                      pkg.popular ? "text-accent-lime" : "text-text-primary"
+                    }`}
+                  >
+                    {pkg.price}
+                    <span className="ml-2 font-mono text-xs tracking-widest text-text-secondary">USD</span>
+                  </p>
+                  <a
+                    href="#contact"
+                    className="inline-flex min-h-11 items-center gap-2 border-b border-text-primary/40 text-sm font-medium text-text-primary transition-colors hover:border-accent-lime hover:text-accent-lime cursor-pointer"
+                  >
+                    {t.services.cta}
+                    <ArrowUpRight size={16} aria-hidden />
+                  </a>
+                </div>
+              </li>
             </Reveal>
-            );
-          })}
-        </div>
+          ))}
+        </ul>
 
         <Reveal>
-          <p className="text-center text-text-secondary text-sm mt-10">
-            {t.services.note}
-          </p>
+          <p className="mt-8 text-sm text-text-secondary">{t.services.note}</p>
         </Reveal>
       </div>
     </section>

@@ -32,9 +32,7 @@ export default function Marquee({ items, reverse = false, variant = "logo", clas
           ) : (
             <span className="font-display text-5xl md:text-7xl tracking-wide">{item.name}</span>
           )}
-          <span className="text-accent-lime text-2xl md:text-4xl" aria-hidden>
-            ✦
-          </span>
+          <span aria-hidden className="h-8 w-px bg-white/20 md:h-12" />
         </li>
       ))}
     </ul>
