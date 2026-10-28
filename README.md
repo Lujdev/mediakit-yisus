@@ -45,7 +45,7 @@ MediaKit web interactivo y de alto impacto visual para **Yisus Contreras** (@yis
 - Auth: contraseña definida en la variable de entorno `ADMIN_PASSWORD` (sesión en cookie httpOnly firmada, 7 días). En producción, sin esa variable el login queda bloqueado. En local, sin variable, se usa una contraseña de desarrollo.
 - Opcional: `ADMIN_SESSION_SECRET` para firmar la sesión con un secreto distinto.
 - Pestañas: Métricas, Visitas, Marcas (logos), Tarifas (ES/EN), Videos, Redes, Mensajes.
-- Visitas: guarda IP, dispositivo, navegador, idioma y origen **30 días** (sin país ni ciudad) (se borran solas: al arrancar, en cada visita con baja probabilidad, al abrir la pestaña y con un cron diario en `vercel.json`). No cuenta bots, recargas repetidas (30 min) ni los dispositivos donde inicias sesión en el admin.
+- Visitas: guarda IP, ubicación aproximada (país y ciudad, la resuelve Vercel a partir de la IP, sin servicios de terceros), dispositivo, navegador, idioma y origen **30 días** (se borran solas: al arrancar, en cada visita con baja probabilidad, al abrir la pestaña y con un cron diario en `vercel.json`). No cuenta bots, recargas repetidas (30 min) ni los dispositivos donde inicias sesión en el admin.
 - Logos: al subir una imagen con fondo blanco, el fondo se elimina automáticamente (`lib/logo.ts`). El sitio los muestra en blanco.
 - Videos: enlaces de YouTube (se reproducen en el sitio), TikTok/Instagram (abren en su app) o `.mp4` directo. Sin videos, la sección no aparece.
 - Contenido editable (marcas, tarifas, redes, videos) vive en la base de datos (Turso en producción) y se siembra con valores por defecto la primera vez.

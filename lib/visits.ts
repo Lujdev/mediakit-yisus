@@ -30,6 +30,13 @@ export async function recordVisit(req: NextRequest, body: { path?: unknown; refe
     } catch {}
   }
 
+  // Approximate place from the IP, resolved by Vercel at the edge (no third-party lookup, nothing leaves your stack).
+  const country = clip(req.headers.get("x-vercel-ip-country"), 2);
+  let city: string | null = null;
+  try {
+    city = clip(decodeURIComponent(req.headers.get("x-vercel-ip-city") ?? ""), 80);
+  } catch {}
+
   const recent = await db.execute({
     sql: `SELECT 1 FROM visits
           WHERE ip IS ? AND os = ? AND browser = ? AND path IS ? AND created_at > datetime('now', '-30 minutes')
@@ -39,9 +46,9 @@ export async function recordVisit(req: NextRequest, body: { path?: unknown; refe
   if (recent.rows.length > 0) return;
 
   await db.execute({
-    sql: `INSERT INTO visits (ip, device, os, browser, lang, referrer, path)
-          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    args: [ip, ua.device, ua.os, ua.browser, clip(body.lang, 20), referrer, path],
+    sql: `INSERT INTO visits (ip, country, city, device, os, browser, lang, referrer, path)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [ip, country, city, ua.device, ua.os, ua.browser, clip(body.lang, 20), referrer, path],
   });
 
   // Keep the 90-day limit even when nobody opens the admin.
@@ -56,7 +63,7 @@ export async function getVisitStats(days: number, purge = true) {
   if (purge) await purgeVisits();
   const since = `-${days} days`;
 
-  const group = async (col: "device" | "os" | "browser" | "lang" | "referrer" | "path"): Promise<Row[]> => {
+  const group = async (col: "device" | "os" | "browser" | "country" | "city" | "lang" | "referrer" | "path"): Promise<Row[]> => {
     const res = await db.execute({
       sql: `SELECT COALESCE(${col}, '') AS k, COUNT(*) AS c FROM visits
             WHERE created_at >= datetime('now', ?) GROUP BY k ORDER BY c DESC LIMIT 8`,
@@ -65,7 +72,7 @@ export async function getVisitStats(days: number, purge = true) {
     return res.rows.map((r) => ({ k: String(r.k), c: Number(r.c) }));
   };
 
-  const [totals, lastRow, daily, recent, device, os, browser, lang, referrer, path] = await Promise.all([
+  const [totals, lastRow, daily, recent, device, os, browser, country, city, lang, referrer, path] = await Promise.all([
     db.execute({
       sql: `SELECT COUNT(*) AS visits, COUNT(DISTINCT COALESCE(ip, '') || '|' || os || '|' || browser) AS visitors
             FROM visits WHERE created_at >= datetime('now', ?)`,
@@ -78,12 +85,14 @@ export async function getVisitStats(days: number, purge = true) {
       args: [since],
     }),
     db.execute(
-      `SELECT ip, device, os, browser, lang, referrer, path, created_at
+      `SELECT ip, country, city, device, os, browser, lang, referrer, path, created_at
        FROM visits ORDER BY id DESC LIMIT 40`
     ),
     group("device"),
     group("os"),
     group("browser"),
+    group("country"),
+    group("city"),
     group("lang"),
     group("referrer"),
     group("path"),
@@ -99,11 +108,15 @@ export async function getVisitStats(days: number, purge = true) {
     device,
     os,
     browser,
+    country,
+    city,
     lang,
     referrer,
     path,
     recent: recent.rows.map((r) => ({
       ip: r.ip ? String(r.ip) : null,
+      country: r.country ? String(r.country) : null,
+      city: r.city ? String(r.city) : null,
       device: String(r.device ?? ""),
       os: String(r.os ?? ""),
       browser: String(r.browser ?? ""),
