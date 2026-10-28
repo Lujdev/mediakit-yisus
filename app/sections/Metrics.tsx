@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, animate, motion, useInView } from "framer-motion";
+import { AnimatePresence, animate, motion, useInView, useReducedMotion } from "framer-motion";
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -11,26 +11,41 @@ import Reveal from "../components/Reveal";
 import SectionHeader from "../components/SectionHeader";
 import { InstagramIcon, TikTokIcon } from "../components/SocialIcons";
 
+function formatCount(n: number) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(Math.floor(n));
+}
+
+/**
+ * Always renders the real figure (previews, screenshots and slow devices never show 0).
+ * When it scrolls into view the number ticks up from 60% of its value, so no zero is ever shown.
+ * iOS Safari throttles frames and delays observers during scroll, hence the timeout that restores
+ * the real figure if the animation stalls.
+ */
 function AnimatedCounter({ value }: { value: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
-  const [display, setDisplay] = useState("0");
+  const reduceMotion = useReducedMotion();
+  const [animated, setAnimated] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!isInView) return;
-    const controls = animate(0, value, {
-      duration: 2,
+    if (!isInView || reduceMotion) return;
+    const controls = animate(value * 0.6, value, {
+      duration: 1.4,
       ease: "easeOut",
-      onUpdate: (latest) => {
-        if (value >= 1000000) setDisplay((latest / 1000000).toFixed(1) + "M");
-        else if (value >= 1000) setDisplay((latest / 1000).toFixed(1) + "K");
-        else setDisplay(Math.floor(latest).toString());
-      },
+      onUpdate: setAnimated,
+      onComplete: () => setAnimated(null),
     });
-    return () => controls.stop();
-  }, [isInView, value]);
+    const fallback = setTimeout(() => setAnimated(null), 2200);
+    return () => {
+      controls.stop();
+      clearTimeout(fallback);
+    };
+  }, [isInView, reduceMotion, value]);
 
   // Digits in the primary colour, the K/M unit in the accent.
+  const display = formatCount(animated ?? value);
   const [, digits = display, unit = ""] = display.match(/^([\d.,]+)(\D*)$/) ?? [];
   return (
     <span ref={ref}>

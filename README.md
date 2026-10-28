@@ -4,7 +4,7 @@ MediaKit web interactivo y de alto impacto visual para **Yisus Contreras** (@yis
 
 ## URL en vivo
 
-> Deployado en Vercel: [https://mediakit-yisus.vercel.app](https://mediakit-yisus.vercel.app)
+> Deployado en Vercel: [https://yisuscontreras.vercel.app](https://yisuscontreras.vercel.app)
 
 ## Características
 
