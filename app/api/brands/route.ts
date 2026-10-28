@@ -40,6 +40,9 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({ success: true, id: Number(result.lastInsertRowid) });
   } catch (error) {
+    if (String(error).includes("UNIQUE")) {
+      return NextResponse.json({ error: "Ya existe una marca con ese nombre" }, { status: 409 });
+    }
     console.error("POST brands error:", error);
     return NextResponse.json({ error: "Error al crear la marca" }, { status: 500 });
   }

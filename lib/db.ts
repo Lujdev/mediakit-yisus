@@ -19,18 +19,6 @@ export { db };
 
 export { DEFAULT_SETTINGS };
 
-// Each later batch is applied once to databases that already exist, tracked by a settings marker,
-// so brands the admin deleted later are not resurrected.
-const BRAND_BATCHES: { id: string; brands: { name: string; logo_url: string | null }[] }[] = [
-  {
-    id: "brands_v2",
-    brands: [
-      { name: "BACC", logo_url: "/brands/bacc.png" },
-      { name: "DERNIER", logo_url: "/brands/dernier.png" },
-    ],
-  },
-];
-
 const DEFAULT_BRANDS = [
   { name: "HERO", logo_url: "/brands/hero.png" },
   { name: "COVAS", logo_url: "/brands/covas.png" },
@@ -38,6 +26,8 @@ const DEFAULT_BRANDS = [
   { name: "ROCKSTAR", logo_url: "/brands/rockstar.png" },
   { name: "ANCDESIGN", logo_url: null },
   { name: "FVPS", logo_url: null },
+  { name: "BACC", logo_url: "/brands/bacc.png" },
+  { name: "DERNIER", logo_url: "/brands/dernier.png" },
 ];
 
 async function createSchema() {
@@ -128,9 +118,62 @@ async function createSchema() {
   `);
 }
 
+/**
+ * Atomically claims a one-time job. Several serverless instances can start at once and all
+ * run initDb(); a "count is zero, so insert" check lets every one of them insert the defaults
+ * (duplicated combos and brands). Only the instance whose INSERT actually adds the marker row proceeds.
+ * Also means defaults are never re-created after an admin deliberately empties a list.
+ */
+async function claim(key: string): Promise<boolean> {
+  const res = await db.execute({
+    sql: "INSERT OR IGNORE INTO settings (key, value) VALUES (?, '1')",
+    args: [key],
+  });
+  return res.rowsAffected === 1;
+}
+
+async function release(key: string) {
+  await db.execute({ sql: "DELETE FROM settings WHERE key = ?", args: [key] });
+}
+
+/** Runs a claimed seed; if it throws, the marker is released so the next start can retry. */
+async function seedOnce(key: string, job: () => Promise<void>) {
+  if (!(await claim(key))) return;
+  try {
+    await job();
+  } catch (err) {
+    await release(key);
+    throw err;
+  }
+}
+
+/** Removes exact duplicates left by earlier concurrent seeding. Cheap and idempotent. */
+async function dedupe() {
+  await db.execute(
+    "DELETE FROM packages WHERE id NOT IN (SELECT MIN(id) FROM packages GROUP BY name, price)"
+  );
+  await db.execute(`
+    DELETE FROM brands WHERE id NOT IN (
+      SELECT (
+        SELECT c.id FROM brands c
+        WHERE UPPER(c.name) = UPPER(b.name)
+        ORDER BY (c.logo_data IS NOT NULL) DESC, c.id
+        LIMIT 1
+      ) FROM brands b
+    )
+  `);
+  // Makes brand seeding race-proof: a second concurrent INSERT OR IGNORE of the same name is a no-op.
+  try {
+    await db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_brands_name ON brands(UPPER(name))");
+  } catch (err) {
+    console.warn("Could not create brands unique index:", err);
+  }
+}
+
 async function seed() {
-  const metrics = await db.execute("SELECT COUNT(*) as count FROM metrics");
-  if (Number(metrics.rows[0].count) === 0) {
+  await seedOnce("seed_metrics_v1", async () => {
+    const existing = await db.execute("SELECT COUNT(*) as count FROM metrics");
+    if (Number(existing.rows[0].count) > 0) return;
     const seedData = [
       { platform: "instagram", metric_type: "followers", value: "12100", label: "Seguidores" },
       { platform: "instagram", metric_type: "views", value: "2051810", label: "Visualizaciones (30d)" },
@@ -141,39 +184,27 @@ async function seed() {
     ];
     for (const row of seedData) {
       await db.execute({
-        sql: `INSERT INTO metrics (platform, metric_type, value, label) VALUES (?, ?, ?, ?)`,
+        sql: `INSERT OR IGNORE INTO metrics (platform, metric_type, value, label) VALUES (?, ?, ?, ?)`,
         args: [row.platform, row.metric_type, row.value, row.label],
       });
     }
-  }
+  });
 
-  const brands = await db.execute("SELECT COUNT(*) as count FROM brands");
-  if (Number(brands.rows[0].count) === 0) {
+  await seedOnce("seed_brands_v1", async () => {
+    // Databases seeded by earlier code carry this marker and already hold their own brand list.
+    const legacy = await db.execute("SELECT 1 FROM settings WHERE key = 'brands_v2'");
+    if (legacy.rows.length > 0) return;
     for (const [i, b] of DEFAULT_BRANDS.entries()) {
       await db.execute({
-        sql: "INSERT INTO brands (name, logo_url, display_order) VALUES (?, ?, ?)",
+        sql: "INSERT OR IGNORE INTO brands (name, logo_url, display_order) VALUES (?, ?, ?)",
         args: [b.name, b.logo_url, i],
       });
     }
-  }
+  });
 
-  for (const batch of BRAND_BATCHES) {
-    const done = await db.execute({ sql: "SELECT 1 FROM settings WHERE key = ?", args: [batch.id] });
-    if (done.rows.length > 0) continue;
-    for (const b of batch.brands) {
-      const exists = await db.execute({ sql: "SELECT 1 FROM brands WHERE name = ?", args: [b.name] });
-      if (exists.rows.length > 0) continue;
-      const order = await db.execute("SELECT COALESCE(MAX(display_order), -1) + 1 AS next FROM brands");
-      await db.execute({
-        sql: "INSERT INTO brands (name, logo_url, display_order) VALUES (?, ?, ?)",
-        args: [b.name, b.logo_url, Number(order.rows[0].next)],
-      });
-    }
-    await db.execute({ sql: "INSERT INTO settings (key, value) VALUES (?, '1')", args: [batch.id] });
-  }
-
-  const packages = await db.execute("SELECT COUNT(*) as count FROM packages");
-  if (Number(packages.rows[0].count) === 0) {
+  await seedOnce("seed_packages_v1", async () => {
+    const existing = await db.execute("SELECT COUNT(*) as count FROM packages");
+    if (Number(existing.rows[0].count) > 0) return;
     const es = dictionary.es.services.packages;
     const en = dictionary.en.services.packages;
     for (const [i, p] of es.entries()) {
@@ -193,7 +224,7 @@ async function seed() {
         ],
       });
     }
-  }
+  });
 
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     await db.execute({
@@ -210,6 +241,7 @@ export function initDb(): Promise<void> {
   if (!ready) {
     ready = (async () => {
       await createSchema();
+      await dedupe();
       await seed();
     })().catch((err) => {
       ready = null; // allow a retry on the next request

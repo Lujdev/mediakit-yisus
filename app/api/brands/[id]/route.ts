@@ -51,6 +51,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
     return NextResponse.json({ success: true });
   } catch (error) {
+    if (String(error).includes("UNIQUE")) {
+      return NextResponse.json({ error: "Ya existe una marca con ese nombre" }, { status: 409 });
+    }
     console.error("PUT brand error:", error);
     return NextResponse.json({ error: "Error al guardar la marca" }, { status: 500 });
   }
