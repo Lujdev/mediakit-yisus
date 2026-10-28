@@ -2,7 +2,10 @@
 
 import { useEffect } from "react";
 
-/** Sends one anonymous-looking page-view beacon per browser session. Renders nothing. */
+/**
+ * Sends one page-view beacon per browser session. Renders nothing.
+ * The endpoint is deliberately named /api/hi: content blockers on phones commonly cut URLs containing "track".
+ */
 export default function Tracker() {
   useEffect(() => {
     try {
@@ -23,8 +26,8 @@ export default function Tracker() {
       const clean = location.pathname + (q.toString() ? `?${q}` : "") + location.hash;
       history.replaceState(null, "", clean);
     }
-    if (!navigator.sendBeacon?.("/api/track", new Blob([data], { type: "application/json" }))) {
-      fetch("/api/track", { method: "POST", body: data, keepalive: true }).catch(() => {});
+    if (!navigator.sendBeacon?.("/api/hi", new Blob([data], { type: "application/json" }))) {
+      fetch("/api/hi", { method: "POST", body: data, keepalive: true }).catch(() => {});
     }
   }, []);
   return null;
