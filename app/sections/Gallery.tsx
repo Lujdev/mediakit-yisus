@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import { GALLERY_IMAGES, type GalleryCategory } from "../data/gallery";
@@ -27,22 +28,26 @@ export default function Gallery() {
   );
   const label = (c: GalleryCategory) => t.gallery.categories[c] ?? c;
 
-  // "View" pill that follows the mouse over photos (fine pointers only).
+  // Circular "view" badge that follows the mouse over photos (fine pointers only).
+  const badgeRef = useRef<HTMLDivElement>(null);
   const moveCursor = (e: React.PointerEvent) => {
     const el = cursorRef.current;
     if (!el || e.pointerType !== "mouse") return;
-    el.style.transform = `translate3d(${e.clientX + 14}px, ${e.clientY + 14}px, 0)`;
+    el.style.transform = `translate3d(${e.clientX - 48}px, ${e.clientY - 48}px, 0)`;
   };
   const showCursor = (visible: boolean) => {
-    if (cursorRef.current) cursorRef.current.style.opacity = visible ? "1" : "0";
+    if (badgeRef.current) badgeRef.current.style.transform = visible ? "scale(1)" : "scale(0)";
   };
 
-  const chip = (active: boolean) =>
-    `shrink-0 min-h-11 rounded-full px-4 text-sm font-medium transition-colors cursor-pointer ${
-      active
-        ? "bg-accent-lime text-bg-primary"
-        : "border border-white/15 text-text-secondary hover:border-accent-lime hover:text-text-primary"
-    }`;
+  const filters: { id: Filter; label: string; count: number }[] = [
+    { id: "all", label: t.gallery.all, count: GALLERY_IMAGES.length },
+    ...categories.map((c) => ({
+      id: c as Filter,
+      label: label(c),
+      count: GALLERY_IMAGES.filter((i) => i.category === c).length,
+    })),
+  ];
+  const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
     <section id="gallery" className="relative py-16 md:py-36 px-4">
@@ -59,16 +64,31 @@ export default function Gallery() {
           <div
             role="group"
             aria-label={t.gallery.filtersLabel}
-            className="mb-8 flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="mb-8 flex gap-x-7 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            <button type="button" aria-pressed={filter === "all"} onClick={() => setFilter("all")} className={chip(filter === "all")}>
-              {t.gallery.all}
-            </button>
-            {categories.map((c) => (
-              <button key={c} type="button" aria-pressed={filter === c} onClick={() => setFilter(c)} className={chip(filter === c)}>
-                {label(c)}
-              </button>
-            ))}
+            {filters.map((f) => {
+              const active = filter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setFilter(f.id)}
+                  className={`group relative shrink-0 min-h-11 py-1 font-display text-3xl uppercase tracking-wide transition-colors cursor-pointer md:text-4xl ${
+                    active ? "text-text-primary" : "text-text-secondary/50 hover:text-text-primary"
+                  }`}
+                >
+                  {f.label}
+                  <sup className="ml-1 align-super font-mono text-[10px] tracking-widest text-accent-lime">{pad(f.count)}</sup>
+                  <span
+                    aria-hidden
+                    className={`absolute bottom-0 left-0 h-[3px] bg-accent-lime transition-all duration-300 ${
+                      active ? "w-full" : "w-0 group-hover:w-1/3"
+                    }`}
+                  />
+                </button>
+              );
+            })}
           </div>
         </Reveal>
 
@@ -105,10 +125,14 @@ export default function Gallery() {
                     className="h-full w-full object-cover md:h-auto grayscale-[35%] transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
                   />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/80 via-transparent to-transparent opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="absolute bottom-3 left-3 font-mono text-[11px] tracking-widest uppercase text-accent-lime md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 transition-all duration-300">
-                  {label(img.category)}
-                </span>
+                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-20">
+                  <span className="font-display text-3xl leading-none tracking-wide text-text-primary md:text-4xl">
+                    {label(img.category)}
+                  </span>
+                  <span className="font-mono text-[11px] tracking-widest text-accent-lime">
+                    {pad(i + 1)}/{pad(images.length)}
+                  </span>
+                </div>
               </button>
             </li>
           ))}
@@ -121,9 +145,25 @@ export default function Gallery() {
       <div
         ref={cursorRef}
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[65] hidden md:block rounded-full bg-accent-lime px-4 py-2 font-mono text-xs tracking-widest uppercase text-bg-primary opacity-0 transition-opacity duration-200"
+        className="pointer-events-none fixed left-0 top-0 z-[65] hidden h-24 w-24 md:block"
       >
-        {t.gallery.view}
+        <div
+          ref={badgeRef}
+          style={{ transform: "scale(0)" }}
+          className="relative flex h-full w-full items-center justify-center rounded-full bg-accent-lime text-bg-primary transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        >
+          <svg viewBox="0 0 100 100" className="absolute inset-0 animate-[spin_9s_linear_infinite] motion-reduce:animate-none">
+            <defs>
+              <path id="gallery-cursor-circle" d="M50,50 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0" />
+            </defs>
+            <text fill="currentColor" fontSize="11" fontWeight="700" className="font-mono uppercase">
+              <textPath href="#gallery-cursor-circle" textLength="224" lengthAdjust="spacing">
+                {`${t.gallery.view} · ${t.gallery.view} · ${t.gallery.view} · `}
+              </textPath>
+            </text>
+          </svg>
+          <ArrowUpRight size={22} />
+        </div>
       </div>
 
       <AnimatePresence>

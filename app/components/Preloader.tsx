@@ -1,93 +1,81 @@
 "use client";
 
+import { AnimatePresence, animate, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useLang } from "../i18n/LanguageProvider";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-
 const letters = ["Y", "I", "S", "U", "S"];
+const ease = [0.76, 0, 0.24, 1] as const;
 
+/** Full-screen intro: oversized name, a 0-100 counter, then a curtain that lifts away. */
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const { t } = useLang();
+  const [count, setCount] = useState(0);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setVisible(false);
-      setTimeout(onComplete, 600);
-    }, 1800);
-    return () => clearTimeout(timer);
-  }, [onComplete]);
-
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.1,
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const controls = animate(0, 100, {
+      duration: 1.8,
+      ease: [0.65, 0, 0.35, 1],
+      onUpdate: (v) => setCount(Math.round(v)),
+      onComplete: () => {
+        timer = setTimeout(() => setVisible(false), 250);
       },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.95,
-      transition: { duration: 0.5, ease: "easeInOut" as const },
-    },
-  };
-
-  const letterVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.4,
-        ease: "easeOut" as const,
-      },
-    },
-  };
+    });
+    document.body.style.overflow = "hidden";
+    return () => {
+      controls.stop();
+      if (timer) clearTimeout(timer);
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={onComplete}>
       {visible && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-bg-primary"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
+          role="status"
+          aria-label={t.preloader}
+          className="fixed inset-0 z-[80] flex flex-col justify-between overflow-hidden bg-bg-primary p-5 md:p-10"
+          exit={{ y: "-100%" }}
+          transition={{ duration: 0.9, ease }}
         >
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-start justify-between font-mono text-[11px] tracking-[0.25em] uppercase text-text-secondary">
+            <span>Yisus Contreras</span>
+            <span>MediaKit</span>
+          </div>
+
+          <div aria-hidden className="flex justify-center font-display leading-[0.8] text-[34vw] md:text-[20rem]">
             {letters.map((letter, i) => (
-              <motion.span
-                key={i}
-                variants={letterVariants}
-                className="font-display text-6xl md:text-9xl text-accent-lime neon-glow"
-                animate={
-                  i === letters.length - 1
-                    ? {
-                        scale: [1, 1.05, 1],
-                        opacity: [1, 0.85, 1, 0.9, 1],
-                        transition: {
-                          delay: 0.1 * letters.length + 0.1,
-                          duration: 0.4,
-                          times: [0, 0.3, 0.5, 0.7, 1],
-                        },
-                      }
-                    : {}
-                }
-              >
-                {letter}
-              </motion.span>
+              <span key={i} className="block overflow-hidden pb-[0.04em]">
+                <motion.span
+                  className={`block ${i === letters.length - 1 ? "text-accent-lime" : "text-text-primary"}`}
+                  initial={{ y: "105%" }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.1 + i * 0.09, ease }}
+                >
+                  {letter}
+                </motion.span>
+              </span>
             ))}
           </div>
-          <motion.div
-            className="absolute bottom-12 left-1/2 -translate-x-1/2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { delay: 0.6 } }}
-          >
-            <p className="text-text-secondary text-sm tracking-[0.3em] uppercase">
+
+          <div className="flex items-end justify-between gap-4">
+            <p className="font-display text-[26vw] leading-[0.8] tabular-nums text-text-primary md:text-[10rem]">
+              {count}
+              <span className="text-accent-lime text-[0.4em]">%</span>
+            </p>
+            <p className="max-w-[10rem] pb-2 text-right font-mono text-[11px] tracking-[0.25em] uppercase text-text-secondary">
               {t.preloader}
             </p>
-          </motion.div>
+          </div>
+
+          <span
+            aria-hidden
+            className="absolute bottom-0 left-0 h-1 bg-accent-lime"
+            style={{ width: `${count}%` }}
+          />
         </motion.div>
       )}
     </AnimatePresence>
