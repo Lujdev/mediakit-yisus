@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Button, Field, PanelHeader, StatusText, inputClass, json, useAdminRequest } from "../ui";
+import MediaManager from "./MediaManager";
+import { useMedia } from "./PhotosPanel";
 
 type Metric = { value: string; label: string };
 type MetricsState = Record<string, Record<string, Metric>>;
@@ -25,6 +27,7 @@ function preview(raw: string) {
 export default function MetricsPanel() {
   const [metrics, setMetrics] = useState<MetricsState>({});
   const { state, run } = useAdminRequest();
+  const { media, reload } = useMedia();
 
   useEffect(() => {
     fetch("/api/metrics", { cache: "no-store" })
@@ -76,6 +79,24 @@ export default function MetricsPanel() {
           {state.kind === "saving" ? "Guardando..." : "Guardar"}
         </Button>
         <StatusText state={state} />
+      </div>
+
+      <div className="mt-14 space-y-10 border-t border-line/10 pt-10">
+        <div>
+          <h2 className="font-display text-3xl leading-none tracking-wide text-text-primary md:text-4xl">Capturas reales</h2>
+          <p className="mt-2 max-w-xl text-sm text-text-secondary">
+            Las capturas de tus estadísticas que se ven bajo las cifras. Agrega, reemplaza, ordena o elimina las que quieras.
+          </p>
+        </div>
+        {media &&
+          (["instagram", "tiktok"] as const).map((platform) => (
+            <section key={platform}>
+              <h3 className="mb-3 font-mono text-xs uppercase tracking-widest text-text-secondary">
+                {PLATFORM_NAMES[platform]}
+              </h3>
+              <MediaManager kind="shot" groupKey={platform} items={media.shots[platform] ?? []} onChanged={reload} />
+            </section>
+          ))}
       </div>
     </div>
   );

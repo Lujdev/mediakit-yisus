@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowUpRight, Film, Image as ImageIcon, Mail, Share2, Tag, TrendingUp, Users, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Camera, Film, Image as ImageIcon, Mail, Share2, Tag, TrendingUp, Users, type LucideIcon } from "lucide-react";
 import { AuthLostContext, Button, inputClass } from "./ui";
 import MetricsPanel from "./panels/MetricsPanel";
 import BrandsPanel from "./panels/BrandsPanel";
@@ -11,10 +11,12 @@ import SocialPanel from "./panels/SocialPanel";
 import VideosPanel from "./panels/VideosPanel";
 import ContactsPanel from "./panels/ContactsPanel";
 import VisitsPanel from "./panels/VisitsPanel";
+import PhotosPanel from "./panels/PhotosPanel";
 
 const TABS: { id: string; label: string; icon: LucideIcon; Panel: () => React.ReactElement }[] = [
   { id: "metrics", label: "Métricas", icon: TrendingUp, Panel: MetricsPanel },
   { id: "visits", label: "Visitas", icon: Users, Panel: VisitsPanel },
+  { id: "photos", label: "Fotos", icon: Camera, Panel: PhotosPanel },
   { id: "brands", label: "Marcas", icon: ImageIcon, Panel: BrandsPanel },
   { id: "packages", label: "Tarifas", icon: Tag, Panel: PackagesPanel },
   { id: "videos", label: "Videos", icon: Film, Panel: VideosPanel },

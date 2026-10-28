@@ -4,7 +4,8 @@ import { AnimatePresence, animate, motion, useInView, useReducedMotion } from "f
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { DETAILS, PERIOD, SHOTS, type MetricDetail } from "../data/metrics-detail";
+import { DETAILS, PERIOD, SHOTS, type MetricDetail, type Shot } from "../data/metrics-detail";
+import { useSiteData } from "../data/SiteData";
 import { useLang } from "../i18n/LanguageProvider";
 import Lightbox from "../components/Lightbox";
 import Reveal from "../components/Reveal";
@@ -116,6 +117,12 @@ const PLATFORMS: { id: string; name: string; Icon: typeof InstagramIcon }[] = [
 
 export default function Metrics() {
   const { t, lang } = useLang();
+  const siteData = useSiteData();
+  // Screenshots managed in the admin; the bundled ones only until the data loads.
+  const shotsFor = (platform: string): Shot[] =>
+    siteData
+      ? (siteData.media.shots[platform] ?? []).map((m) => ({ src: m.src, caption: m.alt }))
+      : (SHOTS[platform] ?? []);
   const [metrics, setMetrics] = useState<MetricsData>({});
   const [loading, setLoading] = useState(true);
   const [openKey, setOpenKey] = useState<string | null>(null);
@@ -147,7 +154,7 @@ export default function Metrics() {
         {PLATFORMS.map(({ id, name, Icon }) => {
           const data = metrics[id];
           if (!data) return null;
-          const shots = SHOTS[id] ?? [];
+          const shots = shotsFor(id);
 
           return (
             <div key={id} className="mb-16 md:mb-24">
@@ -277,7 +284,7 @@ export default function Metrics() {
       <AnimatePresence>
         {viewer && (
           <Lightbox
-            items={(SHOTS[viewer.platform] ?? []).map((s) => ({
+            items={shotsFor(viewer.platform).map((s) => ({
               src: s.src,
               alt: s.caption[lang],
               caption: s.caption[lang],

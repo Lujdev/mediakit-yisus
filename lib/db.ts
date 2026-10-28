@@ -1,6 +1,8 @@
 import { createClient, Client } from "@libsql/client";
 import { dictionary } from "../app/i18n/dictionary";
 import { DEFAULT_SETTINGS } from "./settings-defaults";
+import { GALLERY_IMAGES } from "../app/data/gallery";
+import { SHOTS } from "../app/data/metrics-detail";
 
 let db: Client;
 
@@ -131,6 +133,25 @@ async function createSchema() {
   } catch {}
   await db.execute("CREATE INDEX IF NOT EXISTS idx_visits_created ON visits(created_at)");
 
+  // Editable photos: hero and about overrides, the gallery, and the analytics screenshots. A row with `url` points at a
+  // bundled default image; a row with `data` holds an uploaded (already resized) photo.
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS media (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind TEXT NOT NULL,
+      group_key TEXT,
+      url TEXT,
+      data BLOB,
+      mime TEXT,
+      version INTEGER NOT NULL DEFAULT 0,
+      category TEXT,
+      focal TEXT,
+      alt_es TEXT NOT NULL DEFAULT '',
+      alt_en TEXT NOT NULL DEFAULT '',
+      display_order INTEGER NOT NULL DEFAULT 0
+    )
+  `);
+
   // Short neutral links (/go/<code>) that tag a visit with the channel it came from.
   await db.execute(`
     CREATE TABLE IF NOT EXISTS channels (
@@ -253,6 +274,28 @@ async function seed() {
           i,
         ],
       });
+    }
+  });
+
+  await seedOnce("seed_media_v1", async () => {
+    const existing = await db.execute("SELECT COUNT(*) AS count FROM media");
+    if (Number(existing.rows[0].count) > 0) return;
+    for (const [i, g] of GALLERY_IMAGES.entries()) {
+      await db.execute({
+        sql: `INSERT INTO media (kind, url, category, focal, alt_es, alt_en, display_order)
+              VALUES ('gallery', ?, ?, ?, ?, ?, ?)`,
+        args: [g.src, g.category, g.focal, g.alt.es, g.alt.en, i],
+      });
+    }
+    let order = 0;
+    for (const [platform, shots] of Object.entries(SHOTS)) {
+      for (const shot of shots) {
+        await db.execute({
+          sql: `INSERT INTO media (kind, group_key, url, alt_es, alt_en, display_order)
+                VALUES ('shot', ?, ?, ?, ?, ?)`,
+          args: [platform, shot.src, shot.caption.es, shot.caption.en, order++],
+        });
+      }
     }
   });
 

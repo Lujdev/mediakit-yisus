@@ -14,8 +14,11 @@ const ALL_SECTIONS = ["hero", "about", "metrics", "services", "brands", "gallery
 
 export default function Navigation() {
   const { t } = useLang();
-  const hasVideos = Boolean(useSiteData()?.videos.length);
-  const sections = ALL_SECTIONS.filter((id) => id !== "videos" || hasVideos);
+  const siteData = useSiteData();
+  const hasVideos = Boolean(siteData?.videos.length);
+  // Hidden only once the data has loaded and the admin has removed every gallery photo.
+  const hasGallery = !siteData || siteData.media.gallery.length > 0;
+  const sections = ALL_SECTIONS.filter((id) => (id !== "videos" || hasVideos) && (id !== "gallery" || hasGallery));
   const navLinks = sections.map((id) => ({ label: t.nav.links[id], href: `#${id}` }));
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -41,7 +44,7 @@ export default function Navigation() {
     });
     return () => observer.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasVideos]);
+  }, [hasVideos, hasGallery]);
 
   return (
     <motion.nav

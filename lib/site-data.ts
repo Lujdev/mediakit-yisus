@@ -10,7 +10,21 @@ export type Pkg = {
   features: { es: string[]; en: string[] };
 };
 export type Video = { id: number; title: string; url: string };
+export type MediaItem = {
+  id: number;
+  src: string;
+  category: string | null;
+  focal: string;
+  alt: { es: string; en: string };
+};
+export type SiteMedia = {
+  hero: string | null;
+  about: string | null;
+  gallery: MediaItem[];
+  shots: Record<string, MediaItem[]>;
+};
 export type SiteData = {
+  media: SiteMedia;
   brands: Brand[];
   packages: Pkg[];
   videos: Video[];
@@ -28,16 +42,39 @@ function parseList(raw: unknown): string[] {
 
 export async function getSiteData(): Promise<SiteData> {
   await initDb();
-  const [brands, packages, videos, settings] = await Promise.all([
+  const [brands, packages, videos, settings, media] = await Promise.all([
     db.execute(
       "SELECT id, name, url, logo_url, logo_version, logo_data IS NOT NULL AS has_data FROM brands ORDER BY display_order, id"
     ),
     db.execute("SELECT * FROM packages ORDER BY display_order, id"),
     db.execute("SELECT id, title, url FROM videos ORDER BY display_order, id"),
     db.execute("SELECT key, value FROM settings"),
+    db.execute(
+      `SELECT id, kind, group_key, url, version, category, focal, alt_es, alt_en, data IS NOT NULL AS has_data
+       FROM media ORDER BY display_order, id`
+    ),
   ]);
 
+  const mediaSrc = (r: (typeof media.rows)[number]) =>
+    Number(r.has_data) ? `/api/media/${r.id}?v=${r.version}` : r.url ? String(r.url) : "";
+  const toItem = (r: (typeof media.rows)[number]): MediaItem => ({
+    id: Number(r.id),
+    src: mediaSrc(r),
+    category: r.category ? String(r.category) : null,
+    focal: r.focal ? String(r.focal) : "50% 30%",
+    alt: { es: String(r.alt_es), en: String(r.alt_en) },
+  });
+  const ofKind = (kind: string) => media.rows.filter((r) => r.kind === kind);
+  const shots: Record<string, MediaItem[]> = {};
+  for (const r of ofKind("shot")) (shots[String(r.group_key)] ??= []).push(toItem(r));
+
   return {
+    media: {
+      hero: ofKind("hero")[0] ? mediaSrc(ofKind("hero")[0]) : null,
+      about: ofKind("about")[0] ? mediaSrc(ofKind("about")[0]) : null,
+      gallery: ofKind("gallery").map(toItem),
+      shots,
+    },
     brands: brands.rows.map((r) => ({
       id: Number(r.id),
       name: String(r.name),

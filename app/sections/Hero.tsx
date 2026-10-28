@@ -1,6 +1,7 @@
 "use client";
 
 import { useLang } from "../i18n/LanguageProvider";
+import { useSiteData } from "../data/SiteData";
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
@@ -12,6 +13,8 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function Hero() {
   const { t } = useLang();
+  // Photo set from the admin; the bundled one until it loads or when none was uploaded.
+  const heroSrc = useSiteData()?.media.hero ?? "/images/0.jpg";
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
@@ -29,7 +32,7 @@ export default function Hero() {
       {/* Parallax background */}
       <motion.div style={{ y: imgY, scale: imgScale }} className="absolute inset-0 z-0">
         <Image
-          src="/images/0.jpg"
+          src={heroSrc}
           alt=""
           fill
           priority

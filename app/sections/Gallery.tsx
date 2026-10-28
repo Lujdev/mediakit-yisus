@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { GALLERY_IMAGES, type GalleryCategory } from "../data/gallery";
+import { GALLERY_IMAGES, type GalleryCategory, type GalleryImage } from "../data/gallery";
+import { useSiteData } from "../data/SiteData";
 import { useLang } from "../i18n/LanguageProvider";
 import Lightbox from "../components/Lightbox";
 import Reveal from "../components/Reveal";
@@ -14,17 +15,31 @@ type Filter = "all" | GalleryCategory;
 
 export default function Gallery() {
   const { t, lang } = useLang();
+  const siteData = useSiteData();
+  // Photos managed in the admin. Bundled ones only until the data loads (never when the admin emptied the list).
+  const source: GalleryImage[] = useMemo(
+    () =>
+      siteData
+        ? siteData.media.gallery.map((m) => ({
+            src: m.src,
+            category: (m.category ?? "Outfit") as GalleryCategory,
+            focal: m.focal,
+            alt: m.alt,
+          }))
+        : GALLERY_IMAGES,
+    [siteData]
+  );
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState<number | null>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
 
   const categories = useMemo(
-    () => [...new Set(GALLERY_IMAGES.map((i) => i.category))] as GalleryCategory[],
-    []
+    () => [...new Set(source.map((i) => i.category))] as GalleryCategory[],
+    [source]
   );
   const images = useMemo(
-    () => (filter === "all" ? GALLERY_IMAGES : GALLERY_IMAGES.filter((i) => i.category === filter)),
-    [filter]
+    () => (filter === "all" ? source : source.filter((i) => i.category === filter)),
+    [filter, source]
   );
   const label = (c: GalleryCategory) => t.gallery.categories[c] ?? c;
 
@@ -66,14 +81,16 @@ export default function Gallery() {
   };
 
   const filters: { id: Filter; label: string; count: number }[] = [
-    { id: "all", label: t.gallery.all, count: GALLERY_IMAGES.length },
+    { id: "all", label: t.gallery.all, count: source.length },
     ...categories.map((c) => ({
       id: c as Filter,
       label: label(c),
-      count: GALLERY_IMAGES.filter((i) => i.category === c).length,
+      count: source.filter((i) => i.category === c).length,
     })),
   ];
   const pad = (n: number) => String(n).padStart(2, "0");
+
+  if (siteData && source.length === 0) return null;
 
   return (
     <section id="gallery" className="relative py-16 md:py-36 px-4">

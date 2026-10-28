@@ -4,11 +4,13 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { useRef } from "react";
 import { useLang } from "../i18n/LanguageProvider";
+import { useSiteData } from "../data/SiteData";
 import Reveal from "../components/Reveal";
 import SectionHeader from "../components/SectionHeader";
 
 export default function About() {
   const { t } = useLang();
+  const aboutSrc = useSiteData()?.media.about ?? "/images/1.jpeg";
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const imgY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
@@ -30,7 +32,7 @@ export default function About() {
                 <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-bg-secondary">
                   <motion.div style={{ y: imgY }} className="absolute -inset-[10%]">
                     <Image
-                      src="/images/1.jpeg"
+                      src={aboutSrc}
                       alt="Yisus Contreras"
                       fill
                       sizes="(max-width: 1024px) 100vw, 40vw"
