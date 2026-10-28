@@ -79,7 +79,7 @@ function BrandRow({
         </Field>
         {brand.logo && (
           <label className="flex min-h-11 items-center gap-2 text-sm text-text-secondary cursor-pointer">
-            <input type="checkbox" checked={removeLogo} onChange={(e) => setRemoveLogo(e.target.checked)} className="h-5 w-5 accent-[#C8FF00]" />
+            <input type="checkbox" checked={removeLogo} onChange={(e) => setRemoveLogo(e.target.checked)} className="h-5 w-5 accent-[#D4F23A]" />
             Quitar logo
           </label>
         )}

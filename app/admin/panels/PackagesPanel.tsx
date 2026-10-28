@@ -90,7 +90,7 @@ export default function PackagesPanel() {
                   type="checkbox"
                   checked={row.popular}
                   onChange={(e) => update(i, { popular: e.target.checked })}
-                  className="h-5 w-5 accent-[#C8FF00]"
+                  className="h-5 w-5 accent-[#D4F23A]"
                 />
                 Más popular
               </label>

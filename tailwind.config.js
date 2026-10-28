@@ -8,11 +8,11 @@ module.exports = {
     extend: {
       colors: {
         "bg-primary": "#0A0A0A",
-        "bg-secondary": "#2A2A2A",
-        "accent-lime": "#C8FF00",
-        "accent-orange": "#FF6B35",
+        "bg-secondary": "#161616",
+        "accent-lime": "#D4F23A",
+        "accent-orange": "#FF7A3D",
         "text-primary": "#F5F5F0",
-        "text-secondary": "#A0A0A0",
+        "text-secondary": "#B4B4B0",
       },
       fontFamily: {
         sans: ["var(--font-grotesk)", "system-ui", "sans-serif"],
