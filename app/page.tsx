@@ -14,7 +14,7 @@ import Contact from "./sections/Contact";
 import { SiteDataProvider } from "./data/SiteData";
 import { LanguageProvider, useLang } from "./i18n/LanguageProvider";
 import Ambient from "./components/Ambient";
-import AutoLogo from "./components/AutoLogo";
+import LogoMark from "./components/LogoMark";
 import AttitudeBand from "./components/AttitudeBand";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { MotionConfig } from "framer-motion";
@@ -39,25 +39,13 @@ function HomeContent() {
         <Videos />
         <Contact />
       </main>
-      <footer className="border-t border-line/10 px-4 py-14 md:py-20">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 text-center">
-          <AutoLogo label="Yisus Contreras" className="h-24 md:h-32" />
-          <p className="font-serif text-4xl italic text-text-primary md:text-6xl">
-            {t.preloader}
-            <span aria-hidden className="inline-flex">
-              {[0, 1, 2].map((i) => (
-                <span key={i} className="animate-[dot-blink_1.4s_infinite]" style={{ animationDelay: `${i * 0.2}s` }}>
-                  .
-                </span>
-              ))}
-            </span>
+      <footer className="border-t border-line/10 px-4 py-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 md:flex-row">
+          <LogoMark label="Yisus Contreras" className="h-10" />
+          <p className="text-sm text-text-secondary">
+            © {new Date().getFullYear()} Yisus Contreras. {t.footer.rights}
           </p>
-          <div className="flex w-full flex-col items-center justify-between gap-3 border-t border-line/10 pt-6 text-sm text-text-secondary md:flex-row">
-            <p>
-              © {new Date().getFullYear()} Yisus Contreras. {t.footer.rights}
-            </p>
-            <p>{t.footer.madeWith}</p>
-          </div>
+          <p className="text-sm text-text-secondary">{t.footer.madeWith}</p>
         </div>
       </footer>
     </MotionConfig>
