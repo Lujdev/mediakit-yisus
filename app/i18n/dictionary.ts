@@ -11,6 +11,8 @@ const es = {
     openMenu: "Abrir menú",
     closeMenu: "Cerrar menú",
     langLabel: "Cambiar idioma",
+    themeToLight: "Activar modo claro",
+    themeToDark: "Activar modo oscuro",
     links: {
       hero: "Inicio",
       about: "Sobre mí",
@@ -23,7 +25,6 @@ const es = {
     },
   },
   preloader: "Cargando actitud",
-  preloaderHint: "Mueve o toca el logo",
   preloaderSpin: "Girar el logo",
   hero: {
     badge: "Content Creator · Venezuela",
@@ -194,6 +195,8 @@ const en: Dict = {
     openMenu: "Open menu",
     closeMenu: "Close menu",
     langLabel: "Change language",
+    themeToLight: "Switch to light mode",
+    themeToDark: "Switch to dark mode",
     links: {
       hero: "Home",
       about: "About",
@@ -206,7 +209,6 @@ const en: Dict = {
     },
   },
   preloader: "Loading attitude",
-  preloaderHint: "Move or tap the logo",
   preloaderSpin: "Spin the logo",
   hero: {
     badge: "Content Creator · Venezuela",

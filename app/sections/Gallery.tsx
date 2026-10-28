@@ -105,10 +105,10 @@ export default function Gallery() {
                   }`}
                 >
                   {f.label}
-                  <sup className="ml-1 align-super font-mono text-[10px] tracking-widest text-accent-lime">{pad(f.count)}</sup>
+                  <sup className="ml-1 align-super font-mono text-[10px] tracking-widest text-accent-ink">{pad(f.count)}</sup>
                   <span
                     aria-hidden
-                    className={`absolute bottom-0 left-0 h-[3px] bg-accent-lime transition-all duration-300 ${
+                    className={`absolute bottom-0 left-0 h-[3px] bg-accent-ink transition-all duration-300 ${
                       active ? "w-full" : "w-0 group-hover:w-1/3"
                     }`}
                   />
@@ -158,7 +158,7 @@ export default function Gallery() {
                   <span className="font-display text-3xl leading-none tracking-wide text-text-primary md:text-4xl">
                     {label(img.category)}
                   </span>
-                  <span className="font-mono text-[11px] tracking-widest text-accent-lime">
+                  <span className="font-mono text-[11px] tracking-widest text-accent-ink">
                     {pad(i + 1)}/{pad(images.length)}
                   </span>
                 </div>
@@ -175,7 +175,7 @@ export default function Gallery() {
               aria-label={side === "prev" ? t.gallery.prev : t.gallery.next}
               onClick={() => step(side === "prev" ? -1 : 1)}
               tabIndex={hidden ? -1 : 0}
-              className={`absolute top-[calc(50%-1rem)] z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-bg-primary/80 text-text-primary backdrop-blur transition-opacity duration-200 md:hidden cursor-pointer ${
+              className={`absolute top-[calc(50%-1rem)] z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line/25 bg-bg-primary/80 text-text-primary backdrop-blur transition-opacity duration-200 md:hidden cursor-pointer ${
                 side === "prev" ? "left-1" : "right-1"
               } ${hidden ? "pointer-events-none opacity-0" : "opacity-100"}`}
             >
@@ -197,7 +197,7 @@ export default function Gallery() {
         <div
           ref={badgeRef}
           style={{ transform: "scale(0)" }}
-          className="relative flex h-full w-full items-center justify-center rounded-full bg-accent-lime text-bg-primary transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          className="relative flex h-full w-full items-center justify-center rounded-full bg-accent-lime text-on-accent transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
         >
           <svg viewBox="0 0 100 100" className="absolute inset-0 animate-[spin_9s_linear_infinite] motion-reduce:animate-none">
             <defs>

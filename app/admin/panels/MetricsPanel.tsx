@@ -61,7 +61,7 @@ export default function MetricsPanel() {
                       onChange={(e) => update(platform, type, e.target.value)}
                       className={`${inputClass} pr-16 font-mono`}
                     />
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-display text-xl text-accent-lime">
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-display text-xl text-accent-ink">
                       {preview(data.value)}
                     </span>
                   </div>

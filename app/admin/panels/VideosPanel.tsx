@@ -95,7 +95,7 @@ export default function VideosPanel() {
 
       <div className="space-y-4">
         {rows.map((row, i) => (
-          <div key={row.key} className="rounded-xl border border-white/10 p-3 md:p-4 space-y-3">
+          <div key={row.key} className="rounded-xl border border-line/10 p-3 md:p-4 space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <Field label="Título (opcional)">
                 <input value={row.title} onChange={(e) => update(i, { title: e.target.value })} className={inputClass} />
@@ -126,7 +126,7 @@ export default function VideosPanel() {
         {rows.length === 0 && <p className="text-text-secondary text-sm">No hay videos todavía.</p>}
       </div>
 
-      <div className="mt-6 rounded-xl border border-dashed border-white/15 p-3 md:p-4">
+      <div className="mt-6 rounded-xl border border-dashed border-line/15 p-3 md:p-4">
         <Field label="Subir video">
           <input
             key={fileKey}
@@ -134,12 +134,12 @@ export default function VideosPanel() {
             accept="video/*"
             disabled={progress !== null}
             onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])}
-            className="block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:text-text-primary"
+            className="block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-line/10 file:px-4 file:text-text-primary"
           />
         </Field>
         {progress !== null && (
           <div className="mt-3" role="status" aria-live="polite">
-            <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-line/10">
               <div className="h-full bg-accent-lime transition-all" style={{ width: `${progress}%` }} />
             </div>
             <p className="mt-1 flex items-center gap-1 text-xs text-text-secondary">
@@ -147,7 +147,7 @@ export default function VideosPanel() {
             </p>
           </div>
         )}
-        {uploaded && <p role="status" className="mt-3 text-sm text-accent-lime">Video subido. Pulsa “Guardar videos” para publicarlo.</p>}
+        {uploaded && <p role="status" className="mt-3 text-sm text-accent-ink">Video subido. Pulsa “Guardar videos” para publicarlo.</p>}
         {uploadError && <p role="alert" className="mt-3 text-sm text-red-300">{uploadError}</p>}
       </div>
 

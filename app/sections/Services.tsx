@@ -34,11 +34,11 @@ export default function Services() {
         />
 
         {/* Price list: ruled rows that flood with lime on hover; the popular one is always lit. */}
-        <ul className="border-b border-white/10">
+        <ul className="border-b border-line/10">
           {packages.map((pkg, i) => {
             const lit = active === null ? pkg.popular : active === i;
-            const main = lit ? "text-bg-primary" : "text-text-primary";
-            const soft = lit ? "text-bg-primary/70" : "text-text-secondary";
+            const main = lit ? "text-on-accent" : "text-text-primary";
+            const soft = lit ? "text-on-accent/70" : "text-text-secondary";
             return (
               <Reveal key={pkg.name} delay={i * 0.08}>
                 <li
@@ -46,7 +46,7 @@ export default function Services() {
                   onMouseLeave={() => setActive(null)}
                   onFocusCapture={() => setActive(i)}
                   onBlurCapture={() => setActive(null)}
-                  className="relative isolate overflow-hidden border-t border-white/10"
+                  className="relative isolate overflow-hidden border-t border-line/10"
                 >
                   <span
                     aria-hidden
@@ -55,7 +55,7 @@ export default function Services() {
                     }`}
                   />
                   {pkg.popular && (
-                    <span className="absolute right-4 top-4 rotate-[4deg] bg-accent-orange px-3 py-1 font-display text-xl tracking-wide text-bg-primary md:right-8 md:top-6">
+                    <span className="absolute right-4 top-4 rotate-[4deg] bg-accent-orange px-3 py-1 font-display text-xl tracking-wide text-on-accent md:right-8 md:top-6">
                       {t.services.popular}
                     </span>
                   )}
@@ -76,7 +76,7 @@ export default function Services() {
                         <li key={feature} className="flex gap-3">
                           <span
                             aria-hidden
-                            className={`transition-colors ${lit ? "text-bg-primary" : "text-accent-lime"}`}
+                            className={`transition-colors ${lit ? "text-on-accent" : "text-accent-ink"}`}
                           >
                             —
                           </span>
@@ -85,26 +85,26 @@ export default function Services() {
                       ))}
                     </ul>
 
-                    <div className="flex items-end justify-between gap-4 md:flex-col md:items-end md:justify-start md:gap-6">
+                    <div className="flex flex-col gap-5 md:items-end md:gap-6">
                       <p
                         className={`font-display text-8xl md:text-9xl leading-none transition-colors ${
                           lit
-                            ? "text-bg-primary"
-                            : "text-transparent [-webkit-text-stroke:1.5px_rgba(245,245,240,0.55)]"
+                            ? "text-on-accent"
+                            : "text-transparent [-webkit-text-stroke:1.5px_rgb(var(--text-primary)/0.55)]"
                         }`}
                       >
                         {pkg.price}
                       </p>
                       <a
                         href="#contact"
-                        className={`inline-flex min-h-12 items-center gap-2 rounded-full px-6 font-semibold transition-colors cursor-pointer ${
+                        className={`inline-flex min-h-14 w-full items-center justify-between gap-3 whitespace-nowrap rounded-full px-7 text-base font-semibold transition-colors cursor-pointer md:min-h-12 md:w-auto md:justify-center md:px-6 ${
                           lit
-                            ? "bg-bg-primary text-accent-lime"
+                            ? "bg-on-accent text-accent-lime"
                             : "bg-text-primary text-bg-primary"
                         }`}
                       >
                         {t.services.cta}
-                        <ArrowUpRight size={18} aria-hidden />
+                        <ArrowUpRight size={20} aria-hidden />
                       </a>
                     </div>
                   </div>

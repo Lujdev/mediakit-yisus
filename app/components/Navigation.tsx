@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import Image from "next/image";
 import { useLang } from "../i18n/LanguageProvider";
 import { useSiteData } from "../data/SiteData";
 import LanguageToggle from "./LanguageToggle";
 import { SocialLinks } from "./SocialIcons";
+import LogoMark from "./LogoMark";
+import ThemeToggle from "./ThemeToggle";
 
 const ALL_SECTIONS = ["hero", "about", "metrics", "services", "brands", "gallery", "videos", "contact"] as const;
 
@@ -45,6 +46,8 @@ export default function Navigation() {
   return (
     <motion.nav
       aria-label={t.nav.aria}
+      // Over the dark hero photo the bar keeps dark-theme colours; once scrolled it follows the theme.
+      data-theme={scrolled ? undefined : "dark"}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
@@ -52,12 +55,12 @@ export default function Navigation() {
     >
       <div
         className={`mx-auto max-w-5xl rounded-full px-5 transition-all duration-300 ${
-          scrolled ? "bg-bg-primary/70 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/40" : "border border-transparent"
+          scrolled ? "bg-bg-primary/70 backdrop-blur-xl border border-line/10 shadow-2xl shadow-black/40" : "border border-transparent"
         }`}
       >
         <div className="flex h-14 items-center justify-between">
           <a href="#hero" aria-label="Yisus Contreras" className="inline-flex h-11 items-center cursor-pointer">
-            <Image src="/logo-yc.png" alt="" width={458} height={480} priority className="h-9 w-auto" />
+            <LogoMark className="h-9" />
           </a>
 
           <div className="hidden md:flex items-center gap-1">
@@ -69,7 +72,7 @@ export default function Navigation() {
                   href={link.href}
                   aria-current={isActive ? "true" : undefined}
                   className={`relative px-3 py-2 text-sm tracking-wide rounded-full transition-colors duration-200 cursor-pointer ${
-                    isActive ? "text-bg-primary" : "text-text-secondary hover:text-accent-lime"
+                    isActive ? "text-on-accent" : "text-text-secondary hover:text-accent-ink"
                   }`}
                 >
                   {isActive && (
@@ -85,11 +88,13 @@ export default function Navigation() {
             })}
             <SocialLinks className="ml-2" />
             <LanguageToggle className="ml-1" />
+            <ThemeToggle />
           </div>
 
           <div className="md:hidden flex items-center gap-1">
           <SocialLinks size={18} />
           <LanguageToggle />
+          <ThemeToggle />
           <button
             className="flex h-11 w-11 items-center justify-center text-text-primary cursor-pointer"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -108,7 +113,7 @@ export default function Navigation() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="md:hidden mt-2 mx-auto max-w-5xl rounded-3xl bg-bg-primary/95 backdrop-blur-xl border border-white/10"
+            className="md:hidden mt-2 mx-auto max-w-5xl rounded-3xl bg-bg-primary/95 backdrop-blur-xl border border-line/10"
           >
             <div className="px-6 py-6 space-y-1">
               {navLinks.map((link) => (
@@ -117,7 +122,7 @@ export default function Navigation() {
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
                   className={`block py-3 font-display text-3xl tracking-wide transition-colors cursor-pointer ${
-                    active === link.href ? "text-accent-lime" : "text-text-secondary hover:text-accent-lime"
+                    active === link.href ? "text-accent-ink" : "text-text-secondary hover:text-accent-ink"
                   }`}
                 >
                   {link.label}

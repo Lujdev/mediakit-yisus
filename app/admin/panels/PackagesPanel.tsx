@@ -74,7 +74,7 @@ export default function PackagesPanel() {
     <div>
       <PanelHeader title="Tarifas" description="Cada paquete tiene su texto en español e inglés. Las características van una por línea." />
 
-      <div className="rounded-xl border border-white/10 px-3 md:px-5">
+      <div className="rounded-xl border border-line/10 px-3 md:px-5">
         {rows.map((row, i) => (
           <Disclosure
             key={row.key}
@@ -84,10 +84,10 @@ export default function PackagesPanel() {
                 <span className="flex min-w-0 items-center gap-3">
                   <span className="truncate font-display text-2xl tracking-wide text-text-primary">{row.name || "Nuevo paquete"}</span>
                   {row.popular && (
-                    <span className="shrink-0 bg-accent-orange px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-bg-primary">popular</span>
+                    <span className="shrink-0 bg-accent-orange px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-on-accent">popular</span>
                   )}
                 </span>
-                <span className="font-display text-2xl text-accent-lime">{row.price}</span>
+                <span className="font-display text-2xl text-accent-ink">{row.price}</span>
               </span>
             }
           >

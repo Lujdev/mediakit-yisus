@@ -6,11 +6,11 @@ import type { Brand } from "@/lib/site-data";
 import { Button, Disclosure, Field, PanelHeader, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
 
 const FILE_INPUT =
-  "block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:text-text-primary";
+  "block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-line/10 file:px-4 file:text-text-primary";
 
 function LogoThumb({ src, name }: { src: string | null; name: string }) {
   return (
-    <span className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-white/10 p-1.5">
+    <span className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-line/10 p-1.5">
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={name} className="max-h-full max-w-full object-contain" />
@@ -149,7 +149,7 @@ export default function BrandsPanel() {
 
       <div className="mb-6">
         {adding ? (
-          <div className="space-y-4 rounded-xl border border-accent-lime/40 p-4 md:p-5">
+          <div className="space-y-4 rounded-xl border border-accent-ink/40 p-4 md:p-5">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Nombre">
                 <input autoFocus value={newName} onChange={(e) => setNewName(e.target.value)} className={inputClass} />
@@ -174,7 +174,7 @@ export default function BrandsPanel() {
         )}
       </div>
 
-      <div className="rounded-xl border border-white/10 px-3 md:px-5">
+      <div className="rounded-xl border border-line/10 px-3 md:px-5">
         {brands.map((b, i) => (
           <BrandRow key={`${b.id}-${b.logo}`} brand={b} index={i} count={brands.length} onMove={(to) => reorder(i, to)} onChanged={load} />
         ))}

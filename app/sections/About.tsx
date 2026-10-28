@@ -24,7 +24,7 @@ export default function About() {
               <motion.div
                 aria-hidden
                 style={{ rotate: frameRotate }}
-                className="absolute inset-0 rounded-3xl border border-accent-lime/40 translate-x-4 translate-y-4"
+                className="absolute inset-0 rounded-3xl border border-accent-ink/40 translate-x-4 translate-y-4"
               />
               <Reveal y={50}>
                 <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-bg-secondary">
@@ -66,18 +66,18 @@ export default function About() {
             </Reveal>
 
             {/* Editorial index: numbered rows divided by hairlines, no cards or icons. */}
-            <ol className="border-b border-white/10">
+            <ol className="border-b border-line/10">
               {t.about.pillars.map((pillar, i) => (
                 <Reveal key={pillar.title} delay={i * 0.06}>
-                  <li className="group relative grid grid-cols-[2.5rem_1fr] md:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,1.1fr)] gap-x-3 gap-y-1 border-t border-white/10 py-5 md:py-6 md:items-baseline">
+                  <li className="group relative grid grid-cols-[2.5rem_1fr] md:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,1.1fr)] gap-x-3 gap-y-1 border-t border-line/10 py-5 md:py-6 md:items-baseline">
                     <span
                       aria-hidden
-                      className="absolute left-0 top-0 h-px w-full origin-left scale-x-0 bg-accent-lime transition-transform duration-500 group-hover:scale-x-100"
+                      className="absolute left-0 top-0 h-px w-full origin-left scale-x-0 bg-accent-ink transition-transform duration-500 group-hover:scale-x-100"
                     />
                     <span className="font-mono text-xs tracking-widest text-text-secondary pt-2 md:pt-0">
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <h3 className="font-display text-4xl md:text-5xl leading-none tracking-wide text-text-primary transition-all duration-300 group-hover:translate-x-1 group-hover:text-accent-lime">
+                    <h3 className="font-display text-4xl md:text-5xl leading-none tracking-wide text-text-primary transition-all duration-300 group-hover:translate-x-1 group-hover:text-accent-ink">
                       {pillar.title}
                     </h3>
                     <p className="col-start-2 md:col-start-3 text-text-secondary text-sm md:text-base leading-relaxed">

@@ -27,12 +27,12 @@ export default function Marquee({ items, reverse = false, variant = "logo", clas
               src={item.logo}
               alt={hidden ? "" : item.name}
               loading="lazy"
-              className="h-10 md:h-14 w-auto max-w-[220px] md:max-w-[300px] object-contain opacity-80 hover:opacity-100 transition-opacity [filter:brightness(0)_invert(1)]"
+              className="h-10 md:h-14 w-auto max-w-[220px] md:max-w-[300px] object-contain opacity-80 hover:opacity-100 transition-opacity logo-silhouette"
             />
           ) : (
             <span className="font-display text-5xl md:text-7xl tracking-wide">{item.name}</span>
           )}
-          <span aria-hidden className="h-8 w-px bg-white/20 md:h-12" />
+          <span aria-hidden className="h-8 w-px bg-line/20 md:h-12" />
         </li>
       ))}
     </ul>

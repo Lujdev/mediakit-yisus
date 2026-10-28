@@ -45,7 +45,7 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg-primary px-4">
+    <div data-theme="dark" className="flex min-h-screen items-center justify-center bg-bg-primary px-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-5">
         <Image src="/logo-yc.png" alt="Yisus Contreras" width={458} height={480} className="mx-auto h-20 w-auto" priority />
         <p className="text-center font-mono text-xs uppercase tracking-widest text-text-secondary">Panel</p>
@@ -94,8 +94,8 @@ export default function AdminPage() {
 
   return (
     <AuthLostContext.Provider value={authLost}>
-      <div className="min-h-screen bg-bg-primary text-text-primary">
-        <header className="sticky top-0 z-20 border-b border-white/10 bg-bg-primary/90 backdrop-blur">
+      <div data-theme="dark" className="min-h-screen bg-bg-primary text-text-primary">
+        <header className="sticky top-0 z-20 border-b border-line/10 bg-bg-primary/90 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
             <div className="flex items-center gap-3">
               <Image src="/logo-yc.png" alt="Yisus Contreras" width={458} height={480} className="h-9 w-auto" />
@@ -106,7 +106,7 @@ export default function AdminPage() {
                 href="/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center gap-1 px-3 text-sm text-text-secondary transition-colors hover:text-accent-lime"
+                className="inline-flex min-h-11 items-center gap-1 px-3 text-sm text-text-secondary transition-colors hover:text-accent-ink"
               >
                 Ver sitio <ArrowUpRight size={14} aria-hidden />
               </a>
@@ -131,10 +131,10 @@ export default function AdminPage() {
                   aria-selected={active}
                   onClick={() => setTab(id)}
                   className={`flex min-h-11 shrink-0 cursor-pointer items-center gap-3 rounded-full px-4 text-sm font-medium transition-colors lg:rounded-lg ${
-                    active ? "bg-white/10 text-text-primary" : "text-text-secondary hover:text-text-primary"
+                    active ? "bg-line/10 text-text-primary" : "text-text-secondary hover:text-text-primary"
                   }`}
                 >
-                  <Icon size={16} aria-hidden className={active ? "text-accent-lime" : ""} />
+                  <Icon size={16} aria-hidden className={active ? "text-accent-ink" : ""} />
                   {label}
                 </button>
               );

@@ -79,12 +79,13 @@ export default function Lightbox({ items, index, onIndexChange, onClose }: Light
   const neighbours = count > 1 ? [items[(index + 1) % count], items[(index - 1 + count) % count]] : [];
 
   const navButton =
-    "flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-text-primary hover:border-accent-lime hover:text-accent-lime transition-colors cursor-pointer";
+    "flex h-11 w-11 items-center justify-center rounded-full border border-line/20 text-text-primary hover:border-accent-ink hover:text-accent-ink transition-colors cursor-pointer";
 
   return (
     <motion.div
       ref={dialogRef}
       role="dialog"
+      data-theme="dark"
       aria-modal="true"
       aria-label={item.alt}
       initial={{ opacity: 0 }}
@@ -160,7 +161,7 @@ export default function Lightbox({ items, index, onIndexChange, onClose }: Light
           <ChevronLeft size={20} aria-hidden />
         </button>
         <p className="min-w-0 flex-1 text-center text-sm text-text-primary">
-          <span className="block font-mono text-[11px] tracking-widest uppercase text-accent-lime">{item.caption}</span>
+          <span className="block font-mono text-[11px] tracking-widest uppercase text-accent-ink">{item.caption}</span>
         </p>
         <button type="button" aria-label={t.gallery.next} onClick={() => go(1)} disabled={count < 2} className={navButton}>
           <ChevronRight size={20} aria-hidden />

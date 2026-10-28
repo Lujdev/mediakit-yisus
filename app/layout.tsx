@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Space_Mono, Bebas_Neue } from "next/font/google";
+import { Space_Grotesk, Space_Mono, Bebas_Neue, Instrument_Serif } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
+import { THEME_INIT_SCRIPT } from "./theme/ThemeProvider";
 
 const grotesk = Space_Grotesk({
   variable: "--font-grotesk",
@@ -11,6 +13,14 @@ const grotesk = Space_Grotesk({
 const mono = Space_Mono({
   variable: "--font-mono",
   weight: ["400", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const serif = Instrument_Serif({
+  variable: "--font-serif",
+  weight: "400",
+  style: ["normal", "italic"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -49,9 +59,11 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${grotesk.variable} ${mono.variable} ${bebasNeue.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${grotesk.variable} ${mono.variable} ${bebasNeue.variable} ${serif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg-primary text-text-primary">
+        <Script id="theme-init" strategy="beforeInteractive">{THEME_INIT_SCRIPT}</Script>
         {children}
       </body>
     </html>

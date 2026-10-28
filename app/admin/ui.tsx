@@ -7,7 +7,7 @@ import { createContext, useCallback, useContext, useState, type ReactNode } from
 export const AuthLostContext = createContext<() => void>(() => {});
 
 export const inputClass =
-  "w-full min-h-11 rounded-lg bg-bg-secondary border border-white/10 px-3.5 py-2.5 text-text-primary placeholder:text-text-secondary/50 focus:border-accent-lime focus:outline-none transition-colors";
+  "w-full min-h-11 rounded-lg bg-bg-secondary border border-line/10 px-3.5 py-2.5 text-text-primary placeholder:text-text-secondary/50 focus:border-accent-ink focus:outline-none transition-colors";
 
 export function PanelHeader({ title, description }: { title: string; description?: string }) {
   return (
@@ -30,7 +30,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 
 /** Plain bordered group; no glass or shadows. */
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-xl border border-white/10 bg-bg-secondary/40 p-4 md:p-6 ${className}`}>{children}</div>;
+  return <div className={`rounded-xl border border-line/10 bg-bg-secondary/40 p-4 md:p-6 ${className}`}>{children}</div>;
 }
 
 /** A row that opens to reveal its form: keeps long lists short and scannable. */
@@ -45,12 +45,12 @@ export function Disclosure({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-t border-white/10 first:border-t-0">
+    <div className="border-t border-line/10 first:border-t-0">
       <button
         type="button"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="flex min-h-16 w-full cursor-pointer items-center gap-4 px-1 py-3 text-left transition-colors hover:text-accent-lime"
+        className="flex min-h-16 w-full cursor-pointer items-center gap-4 px-1 py-3 text-left transition-colors hover:text-accent-ink"
       >
         <span className="min-w-0 flex-1">{summary}</span>
         <ChevronDown
@@ -70,8 +70,8 @@ export function Button({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "ghost" | "danger" }) {
   const styles = {
-    primary: "bg-accent-lime text-bg-primary hover:bg-accent-orange",
-    ghost: "border border-white/15 text-text-primary hover:border-accent-lime hover:text-accent-lime",
+    primary: "bg-accent-lime text-on-accent hover:bg-accent-orange",
+    ghost: "border border-line/15 text-text-primary hover:border-accent-ink hover:text-accent-ink",
     danger: "text-red-300 hover:bg-red-500/10",
   }[variant];
   return (
@@ -86,7 +86,7 @@ export function Button({
 export type SaveState = { kind: "idle" | "saving" | "saved" | "error"; message?: string };
 
 export function StatusText({ state }: { state: SaveState }) {
-  if (state.kind === "saved") return <span role="status" className="text-sm text-accent-lime">Guardado ✓</span>;
+  if (state.kind === "saved") return <span role="status" className="text-sm text-accent-ink">Guardado ✓</span>;
   if (state.kind === "error") return <span role="alert" className="text-sm text-red-300">{state.message}</span>;
   return null;
 }

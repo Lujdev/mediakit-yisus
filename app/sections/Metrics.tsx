@@ -50,7 +50,7 @@ function AnimatedCounter({ value }: { value: number }) {
   return (
     <span ref={ref}>
       {digits}
-      <span className="text-accent-lime">{unit}</span>
+      <span className="text-accent-ink">{unit}</span>
     </span>
   );
 }
@@ -73,13 +73,13 @@ function DetailPanel({ detail }: { detail: MetricDetail }) {
                   <span>{bar.label[lang]}</span>
                   <span className="font-mono">{bar.value}</span>
                 </div>
-                <div className="h-1.5 w-full bg-white/10">
+                <div className="h-1.5 w-full bg-line/10">
                   <motion.div
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
                     transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                     style={{ width: `${Math.max(bar.pct, 2)}%` }}
-                    className="h-full origin-left bg-accent-lime"
+                    className="h-full origin-left bg-accent-ink"
                   />
                 </div>
               </li>
@@ -90,7 +90,7 @@ function DetailPanel({ detail }: { detail: MetricDetail }) {
       {detail.stats && (
         <ul>
           {detail.stats.map((stat) => (
-            <li key={stat.label.es} className="flex justify-between gap-4 border-t border-white/10 py-2.5">
+            <li key={stat.label.es} className="flex justify-between gap-4 border-t border-line/10 py-2.5">
               <span className="text-text-secondary">{stat.label[lang]}</span>
               <span className="font-mono text-text-primary">{stat.value}</span>
             </li>
@@ -153,7 +153,7 @@ export default function Metrics() {
             <div key={id} className="mb-16 md:mb-24">
               <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
                 <h3 className="flex items-center gap-3 font-display text-3xl md:text-4xl tracking-wide text-text-primary">
-                  <Icon size={22} className="text-accent-lime" />
+                  <Icon size={22} className="text-accent-ink" />
                   {name}
                 </h3>
                 {PERIOD[id] && (
@@ -163,7 +163,7 @@ export default function Metrics() {
                 )}
               </div>
 
-              <ul className="grid grid-cols-1 items-start border-y border-white/10 md:grid-cols-3 md:divide-x md:divide-white/10">
+              <ul className="grid grid-cols-1 items-start border-y border-line/10 md:grid-cols-3 md:divide-x md:divide-line/10">
                 {Object.entries(data).map(([key, metric], i) => {
                   const detailKey = `${id}.${key}`;
                   const detail = DETAILS[detailKey];
@@ -178,8 +178,8 @@ export default function Metrics() {
                         {detail && (
                           <span
                             aria-hidden
-                            className={`flex h-7 w-7 items-center justify-center rounded-full border border-white/20 transition-all duration-300 group-hover:border-accent-lime group-hover:text-accent-lime ${
-                              open ? "rotate-45 border-accent-lime text-accent-lime" : ""
+                            className={`flex h-7 w-7 items-center justify-center rounded-full border border-line/20 transition-all duration-300 group-hover:border-accent-ink group-hover:text-accent-ink ${
+                              open ? "rotate-45 border-accent-ink text-accent-ink" : ""
                             }`}
                           >
                             <Plus size={14} />
@@ -198,7 +198,7 @@ export default function Metrics() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                      className="border-t border-white/10 first:border-t-0 md:border-t-0 md:px-8 md:first:pl-0"
+                      className="border-t border-line/10 first:border-t-0 md:border-t-0 md:px-8 md:first:pl-0"
                     >
                       {detail ? (
                         <button
@@ -247,7 +247,7 @@ export default function Metrics() {
                           aria-label={`${t.metrics.openShot}: ${shot.caption[lang]}`}
                           className="group block w-full cursor-pointer text-left"
                         >
-                          <span className="relative block aspect-[540/1170] overflow-hidden rounded-2xl ring-1 ring-white/10 transition-all duration-300 group-hover:-translate-y-1 group-hover:ring-accent-lime/60">
+                          <span className="relative block aspect-[540/1170] overflow-hidden rounded-2xl ring-1 ring-line/10 transition-all duration-300 group-hover:-translate-y-1 group-hover:ring-accent-ink/60">
                             <Image
                               src={shot.src}
                               alt=""

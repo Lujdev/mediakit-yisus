@@ -14,7 +14,7 @@ export default function LanguageToggle({ className = "" }: { className?: string 
       {(["es", "en"] as const).map((l, i) => (
         <span key={l} className="inline-flex items-center">
           {i === 1 && (
-            <span aria-hidden className="text-white/20">
+            <span aria-hidden className="text-line/20">
               /
             </span>
           )}
@@ -30,7 +30,7 @@ export default function LanguageToggle({ className = "" }: { className?: string 
             {l}
             <span
               aria-hidden
-              className={`absolute left-2.5 right-2.5 bottom-[9px] h-px bg-accent-lime transition-opacity duration-200 ${
+              className={`absolute left-2.5 right-2.5 bottom-[9px] h-px bg-accent-ink transition-opacity duration-200 ${
                 lang === l ? "opacity-100" : "opacity-0"
               }`}
             />

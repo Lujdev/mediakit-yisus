@@ -23,6 +23,7 @@ export default function Hero() {
     <section
       ref={ref}
       id="hero"
+      data-theme="dark"
       className="relative min-h-[100svh] flex items-center justify-center overflow-hidden"
     >
       {/* Parallax background */}
@@ -58,7 +59,7 @@ export default function Hero() {
           {["YISUS", "CONTRERAS"].map((word, i) => (
             <span key={word} className="block overflow-hidden pb-[0.05em]">
               <motion.span
-                className={`block ${i === 1 ? "text-accent-lime" : "text-text-primary"}`}
+                className={`block ${i === 1 ? "text-accent-ink" : "text-text-primary"}`}
                 initial={{ y: "110%", rotate: 2 }}
                 animate={{ y: 0, rotate: 0 }}
                 transition={{ duration: 1, delay: 0.35 + i * 0.15, ease }}
@@ -87,7 +88,7 @@ export default function Hero() {
           <Magnetic className="block sm:inline-block">
             <a
               href="#contact"
-              className="group flex sm:inline-flex items-center justify-center gap-2 px-8 py-4 bg-accent-lime text-bg-primary font-semibold rounded-full hover:bg-accent-orange transition-colors duration-300 cursor-pointer"
+              className="group flex sm:inline-flex items-center justify-center gap-2 px-8 py-4 bg-accent-lime text-on-accent font-semibold rounded-full hover:bg-accent-orange transition-colors duration-300 cursor-pointer"
             >
               {t.hero.cta}
               <ArrowUpRight
@@ -99,7 +100,7 @@ export default function Hero() {
           <Magnetic className="block sm:inline-block">
             <a
               href="#about"
-              className="flex sm:inline-flex items-center justify-center px-8 py-4 border border-white/20 text-text-primary rounded-full hover:border-accent-lime hover:text-accent-lime transition-colors duration-300 cursor-pointer backdrop-blur"
+              className="flex sm:inline-flex items-center justify-center px-8 py-4 border border-line/20 text-text-primary rounded-full hover:border-accent-ink hover:text-accent-ink transition-colors duration-300 cursor-pointer backdrop-blur"
             >
               {t.hero.ctaSecondary}
             </a>
@@ -111,7 +112,7 @@ export default function Hero() {
       <motion.a
         href="#about"
         aria-label={t.hero.scrollAria}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-text-secondary hover:text-accent-lime transition-colors cursor-pointer"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-text-secondary hover:text-accent-ink transition-colors cursor-pointer"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, y: [0, 8, 0] }}
         transition={{

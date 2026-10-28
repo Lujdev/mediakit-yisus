@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import Preloader from "./components/Preloader";
 import Navigation from "./components/Navigation";
@@ -15,6 +14,8 @@ import Contact from "./sections/Contact";
 import { SiteDataProvider } from "./data/SiteData";
 import { LanguageProvider, useLang } from "./i18n/LanguageProvider";
 import Ambient from "./components/Ambient";
+import LogoMark from "./components/LogoMark";
+import { ThemeProvider } from "./theme/ThemeProvider";
 import { MotionConfig } from "framer-motion";
 
 function HomeContent() {
@@ -36,9 +37,9 @@ function HomeContent() {
         <Videos />
         <Contact />
       </main>
-      <footer className="border-t border-white/5 py-8 px-4">
+      <footer className="border-t border-line/5 py-8 px-4">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4">
-          <Image src="/logo-yc.png" alt="Yisus Contreras" width={458} height={480} className="h-14 w-auto" />
+          <LogoMark label="Yisus Contreras" className="h-14" />
           <p className="text-text-secondary text-sm">
             © {new Date().getFullYear()} Yisus Contreras. {t.footer.rights}
           </p>
@@ -53,10 +54,12 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <LanguageProvider>
-      <SiteDataProvider>
-        <HomeContent />
-      </SiteDataProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <SiteDataProvider>
+          <HomeContent />
+        </SiteDataProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }

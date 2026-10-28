@@ -33,7 +33,7 @@ export function WhatsAppIcon({ className, size = 24 }: IconProps) {
 export function SocialLinks({ className = "", size = 20 }: { className?: string; size?: number }) {
   const settings = useSiteData()?.settings ?? DEFAULT_SETTINGS;
   const link =
-    "flex h-11 w-11 items-center justify-center text-text-secondary transition-colors hover:text-accent-lime cursor-pointer";
+    "flex h-11 w-11 items-center justify-center text-text-secondary transition-colors hover:text-accent-ink cursor-pointer";
   return (
     <div className={`flex items-center ${className}`}>
       <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className={link}>

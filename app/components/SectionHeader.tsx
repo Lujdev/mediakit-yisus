@@ -23,12 +23,12 @@ export default function SectionHeader({
     <header className={`mb-14 md:mb-20 ${center ? "text-center" : ""}`}>
       <Reveal>
         <p
-          className={`flex items-center gap-3 text-accent-lime text-xs md:text-sm tracking-[0.3em] uppercase mb-5 ${
+          className={`flex items-center gap-3 text-accent-ink text-xs md:text-sm tracking-[0.3em] uppercase mb-5 ${
             center ? "justify-center" : ""
           }`}
         >
           <span className="font-mono text-text-secondary">{index}</span>
-          <span className="h-px w-10 bg-accent-lime/60" />
+          <span className="h-px w-10 bg-accent-ink/60" />
           {eyebrow}
         </p>
       </Reveal>

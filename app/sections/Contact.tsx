@@ -11,7 +11,7 @@ import { InstagramIcon, TikTokIcon, WhatsAppIcon } from "../components/SocialIco
 
 /** Underline-only fields: lighter than boxed inputs and consistent with the ruled lists. */
 const FIELD =
-  "w-full min-h-11 bg-transparent border-0 border-b border-white/20 rounded-none px-0 py-3 text-text-primary placeholder:text-text-secondary/40 focus:border-accent-lime focus:outline-none transition-colors";
+  "w-full min-h-11 bg-transparent border-0 border-b border-line/20 rounded-none px-0 py-3 text-text-primary placeholder:text-text-secondary/40 focus:border-accent-ink focus:outline-none transition-colors";
 
 export default function Contact() {
   const { t } = useLang();
@@ -66,7 +66,7 @@ export default function Contact() {
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex min-h-20 items-center justify-between gap-4 rounded-full bg-accent-lime px-7 py-4 text-bg-primary transition-colors hover:bg-accent-orange cursor-pointer"
+              className="group flex min-h-20 items-center justify-between gap-4 rounded-full bg-accent-lime px-7 py-4 text-on-accent transition-colors hover:bg-accent-orange cursor-pointer"
             >
               <span className="flex items-center gap-3 text-lg font-semibold md:text-xl">
                 <WhatsAppIcon size={28} />
@@ -79,17 +79,17 @@ export default function Contact() {
               />
             </a>
 
-            <ul className="mt-10 border-b border-white/10">
+            <ul className="mt-10 border-b border-line/10">
               {channels.map(({ name, label: text, href, Icon }) => (
                 <li key={name}>
                   <a
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex min-h-16 items-center gap-4 border-t border-white/10 py-4 cursor-pointer"
+                    className="group flex min-h-16 items-center gap-4 border-t border-line/10 py-4 cursor-pointer"
                   >
-                    <Icon size={22} className="shrink-0 text-text-secondary transition-colors group-hover:text-accent-lime" />
-                    <span className="flex-1 text-lg text-text-primary transition-colors group-hover:text-accent-lime md:text-xl">
+                    <Icon size={22} className="shrink-0 text-text-secondary transition-colors group-hover:text-accent-ink" />
+                    <span className="flex-1 text-lg text-text-primary transition-colors group-hover:text-accent-ink md:text-xl">
                       {text}
                     </span>
                     <ArrowUpRight
@@ -112,7 +112,7 @@ export default function Contact() {
               <ol className="mt-2 space-y-2">
                 {t.contact.important.map((item, i) => (
                   <li key={item} className="flex gap-3">
-                    <span aria-hidden className="pt-0.5 font-mono text-xs text-accent-lime">
+                    <span aria-hidden className="pt-0.5 font-mono text-xs text-accent-ink">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {item}
@@ -177,14 +177,14 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-text-primary/40 px-8 font-semibold text-text-primary transition-colors hover:border-accent-lime hover:text-accent-lime disabled:opacity-50 md:w-auto cursor-pointer"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-text-primary/40 px-8 font-semibold text-text-primary transition-colors hover:border-accent-ink hover:text-accent-ink disabled:opacity-50 md:w-auto cursor-pointer"
               >
                 {status === "sending" ? t.contact.sending : t.contact.submit}
                 <ArrowUpRight size={18} aria-hidden />
               </button>
 
               <div aria-live="polite">
-                {status === "success" && <p className="text-sm text-accent-lime">{t.contact.success}</p>}
+                {status === "success" && <p className="text-sm text-accent-ink">{t.contact.success}</p>}
                 {status === "error" && <p className="text-sm text-red-400">{t.contact.error}</p>}
               </div>
             </form>

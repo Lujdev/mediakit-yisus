@@ -19,7 +19,7 @@ export default function SplitHeading({ lines, className = "", accentLine }: Spli
       {lines.map((line, i) => (
         <span key={line} className="block overflow-hidden pb-[0.06em]">
           <motion.span
-            className={`block ${accentLine === i ? "text-accent-lime" : ""}`}
+            className={`block ${accentLine === i ? "text-accent-ink" : ""}`}
             initial={{ y: "110%" }}
             animate={inView ? { y: 0 } : undefined}
             transition={{ duration: 0.9, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}

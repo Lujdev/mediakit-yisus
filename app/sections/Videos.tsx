@@ -67,7 +67,7 @@ function YouTubeLite({ id, title }: { id: string; title: string }) {
         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       <span className="absolute inset-0 bg-bg-primary/30 group-hover:bg-bg-primary/10 transition-colors" />
-      <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent-lime text-bg-primary shadow-xl shadow-black/40 transition-transform group-hover:scale-110">
+      <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent-lime text-on-accent shadow-xl shadow-black/40 transition-transform group-hover:scale-110">
         <Play size={26} fill="currentColor" aria-hidden />
       </span>
     </button>
@@ -80,7 +80,7 @@ function VideoCard({ video }: { video: Video }) {
 
   return (
     <figure className="flex flex-col gap-3">
-      <div className="relative aspect-video overflow-hidden rounded-2xl bg-bg-secondary ring-1 ring-white/10">
+      <div className="relative aspect-video overflow-hidden rounded-2xl bg-bg-secondary ring-1 ring-line/10">
         {kind.type === "youtube" && <YouTubeLite id={kind.id} title={video.title} />}
         {kind.type === "file" && (
           <video
@@ -99,10 +99,10 @@ function VideoCard({ video }: { video: Video }) {
             rel="noopener noreferrer"
             className="group absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-bg-secondary to-bg-primary cursor-pointer"
           >
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-lime text-bg-primary transition-transform group-hover:scale-110">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-lime text-on-accent transition-transform group-hover:scale-110">
               <Play size={22} fill="currentColor" aria-hidden />
             </span>
-            <span className="inline-flex items-center gap-1 font-mono text-xs tracking-widest uppercase text-text-secondary group-hover:text-accent-lime transition-colors">
+            <span className="inline-flex items-center gap-1 font-mono text-xs tracking-widest uppercase text-text-secondary group-hover:text-accent-ink transition-colors">
               {t.videos.watchOn} {kind.platform}
               <ArrowUpRight size={14} aria-hidden />
             </span>
