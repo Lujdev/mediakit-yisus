@@ -3,13 +3,9 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { useRef } from "react";
-import { Shirt, Palmtree, Clapperboard, Briefcase } from "lucide-react";
 import { useLang } from "../i18n/LanguageProvider";
 import Reveal from "../components/Reveal";
 import SectionHeader from "../components/SectionHeader";
-import SpotlightCard from "../components/SpotlightCard";
-
-const pillarIcons = [Shirt, Palmtree, Clapperboard, Briefcase];
 
 export default function About() {
   const { t } = useLang();
@@ -69,26 +65,28 @@ export default function About() {
               </p>
             </Reveal>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {t.about.pillars.map((pillar, i) => {
-                const Icon = pillarIcons[i];
-                return (
-                <Reveal key={pillar.title} delay={i * 0.08}>
-                  <SpotlightCard className="glass rounded-2xl p-6 h-full hover:border-accent-lime/30 transition-colors duration-300 group">
-                    <Icon
-                      className="text-accent-lime mb-4 transition-transform duration-300 group-hover:-translate-y-1 group-hover:rotate-6"
-                      size={28}
+            {/* Editorial index: numbered rows divided by hairlines, no cards or icons. */}
+            <ol className="border-b border-white/10">
+              {t.about.pillars.map((pillar, i) => (
+                <Reveal key={pillar.title} delay={i * 0.06}>
+                  <li className="group relative grid grid-cols-[2.5rem_1fr] md:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,1.1fr)] gap-x-3 gap-y-1 border-t border-white/10 py-5 md:py-6 md:items-baseline">
+                    <span
                       aria-hidden
+                      className="absolute left-0 top-0 h-px w-full origin-left scale-x-0 bg-accent-lime transition-transform duration-500 group-hover:scale-x-100"
                     />
-                    <h3 className="font-display text-2xl tracking-wide text-text-primary mb-1">
+                    <span className="font-mono text-xs tracking-widest text-text-secondary pt-2 md:pt-0">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="font-display text-4xl md:text-5xl leading-none tracking-wide text-text-primary transition-all duration-300 group-hover:translate-x-1 group-hover:text-accent-lime">
                       {pillar.title}
                     </h3>
-                    <p className="text-text-secondary text-sm">{pillar.desc}</p>
-                  </SpotlightCard>
+                    <p className="col-start-2 md:col-start-3 text-text-secondary text-sm md:text-base leading-relaxed">
+                      {pillar.desc}
+                    </p>
+                  </li>
                 </Reveal>
-                );
-              })}
-            </div>
+              ))}
+            </ol>
           </div>
         </div>
       </div>

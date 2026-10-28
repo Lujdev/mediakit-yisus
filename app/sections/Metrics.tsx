@@ -4,7 +4,6 @@ import { useLang } from "../i18n/LanguageProvider";
 import SectionHeader from "../components/SectionHeader";
 import { motion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Users, Eye, Heart } from "lucide-react";
 import InstagramIcon from "../components/InstagramIcon";
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
@@ -30,10 +29,14 @@ function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: strin
     return () => controls.stop();
   }, [isInView, value]);
 
+  const [, digits = display, unit = ""] = display.match(/^([\d.,]+)(\D*)$/) ?? [];
   return (
     <span ref={ref}>
-      {display}
-      {suffix}
+      {digits}
+      <span className="text-accent-lime">
+        {unit}
+        {suffix}
+      </span>
     </span>
   );
 }
@@ -47,13 +50,6 @@ interface MetricsData {
   instagram?: Record<string, MetricData>;
   tiktok?: Record<string, MetricData>;
 }
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
-  followers: Users,
-  views: Eye,
-  new_followers: Users,
-  likes: Heart,
-};
 
 export default function Metrics() {
   const { t } = useLang();
@@ -83,38 +79,30 @@ export default function Metrics() {
     if (!data) return null;
 
     return (
-      <div className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
+      <div className="mb-14 md:mb-20">
+        <div className="mb-2 flex items-center gap-3 text-text-secondary">
           {platformIcon}
-          <h3 className="font-display text-3xl text-text-primary uppercase">
-            {platform}
-          </h3>
+          <h3 className="font-mono text-xs tracking-[0.3em] uppercase">{platform}</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Object.entries(data).map(([key, metric], i) => {
-            const Icon = iconMap[key] || Eye;
-            return (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="glass rounded-2xl p-6 md:p-8 text-center hover:border-accent-lime/20 transition-colors"
-              >
-                <Icon className="mx-auto text-accent-lime mb-4" size={32} />
-                <div className="font-display text-4xl md:text-5xl text-text-primary mb-2">
-                  {loading ? (
-                    "..."
-                  ) : (
-                    <AnimatedCounter value={parseValue(metric.value)} />
-                  )}
-                </div>
-                <p className="text-text-secondary text-sm">{t.metrics.labels[key] ?? metric.label}</p>
-              </motion.div>
-            );
-          })}
-        </div>
+        <dl className="grid grid-cols-1 md:grid-cols-3 md:divide-x md:divide-white/10 border-y border-white/10">
+          {Object.entries(data).map(([key, metric], i) => (
+            <motion.div
+              key={key}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-baseline justify-between gap-4 py-5 md:flex-col md:items-start md:justify-start md:gap-2 md:py-10 md:px-8 md:first:pl-0 border-t border-white/10 first:border-t-0 md:border-t-0"
+            >
+              <dt className="order-2 md:order-2 text-text-secondary text-sm md:text-base">
+                {t.metrics.labels[key] ?? metric.label}
+              </dt>
+              <dd className="order-1 font-display text-6xl md:text-8xl leading-none text-text-primary">
+                {loading ? "…" : <AnimatedCounter value={parseValue(metric.value)} />}
+              </dd>
+            </motion.div>
+          ))}
+        </dl>
       </div>
     );
   };
@@ -133,16 +121,16 @@ export default function Metrics() {
         {renderPlatform(
           "instagram",
           metrics.instagram,
-          <InstagramIcon className="text-accent-orange" size={28} />
+          <InstagramIcon className="text-text-secondary" size={18} />
         )}
 
         {renderPlatform(
           "tiktok",
           metrics.tiktok,
           <svg
-            className="text-accent-orange"
-            width="28"
-            height="28"
+            className="text-text-secondary"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="currentColor"
           >
