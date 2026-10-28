@@ -251,8 +251,13 @@ async function seed() {
   }
 }
 
-/** Visit records (which include IPs) are kept for 90 days and no longer. */
-export const VISIT_RETENTION_DAYS = 90;
+/** Visit records (which include IPs) are kept for 30 days and no longer. */
+export const VISIT_RETENTION_DAYS = 30;
+
+/** Location is no longer collected; clears any country/city saved by earlier versions. */
+async function wipeLocation() {
+  await db.execute("UPDATE visits SET country = NULL, city = NULL WHERE country IS NOT NULL OR city IS NOT NULL");
+}
 
 export async function purgeVisits() {
   await db.execute({
@@ -270,6 +275,7 @@ export function initDb(): Promise<void> {
       await createSchema();
       await dedupe();
       await seed();
+      await wipeLocation();
       await purgeVisits();
     })().catch((err) => {
       ready = null; // allow a retry on the next request

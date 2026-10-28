@@ -6,8 +6,6 @@ import { AuthLostContext, Button, PanelHeader, json } from "../ui";
 type Row = { k: string; c: number };
 type Recent = {
   ip: string | null;
-  country: string | null;
-  city: string | null;
   device: string;
   os: string;
   browser: string;
@@ -25,24 +23,14 @@ type Stats = {
   device: Row[];
   os: Row[];
   browser: Row[];
-  country: Row[];
   lang: Row[];
   referrer: Row[];
   path: Row[];
   recent: Recent[];
 };
 
-const RANGES = [7, 30, 90] as const;
+const RANGES = [7, 14, 30] as const;
 const DEVICES: Record<string, string> = { mobile: "Móvil", tablet: "Tableta", desktop: "Escritorio" };
-
-const regionNames = typeof Intl !== "undefined" && "DisplayNames" in Intl ? new Intl.DisplayNames(["es"], { type: "region" }) : null;
-const countryName = (code: string) => {
-  try {
-    return regionNames?.of(code.toUpperCase()) ?? code;
-  } catch {
-    return code;
-  }
-};
 
 function BarList({ title, rows, label }: { title: string; rows: Row[]; label?: (k: string) => string }) {
   const max = Math.max(1, ...rows.map((r) => r.c));
@@ -181,7 +169,7 @@ export default function VisitsPanel() {
     <div>
       <PanelHeader
         title="Visitas"
-        description="Se guardan la IP y los datos del dispositivo durante 90 días; después se borran solas. Los bots no se cuentan y una misma persona no se repite al recargar."
+        description="Se guardan la IP y los datos del dispositivo durante 30 días; después se borran solas. Los bots no se cuentan y una misma persona no se repite al recargar."
       />
 
       <div className="mb-8 flex flex-wrap items-center gap-3 rounded-xl border border-line/10 p-4 text-sm">
@@ -264,7 +252,6 @@ export default function VisitsPanel() {
             <BarList title="Dispositivo" rows={stats.device} label={(k) => DEVICES[k] ?? k} />
             <BarList title="Sistema" rows={stats.os} />
             <BarList title="Navegador" rows={stats.browser} />
-            <BarList title="País" rows={stats.country} label={(k) => (k ? countryName(k) : "Desconocido")} />
             <BarList title="Idioma del navegador" rows={stats.lang} label={(k) => k || "—"} />
             <BarList title="Origen" rows={stats.referrer} label={(k) => k || "Directo"} />
           </div>
@@ -282,8 +269,6 @@ export default function VisitsPanel() {
                       <span className="font-mono text-[11px] text-text-secondary">{new Date(r.at).toLocaleString()}</span>
                     </div>
                     <p className="mt-0.5 text-text-secondary">
-                      {[r.city, r.country ? countryName(r.country) : null].filter(Boolean).join(", ") || "Ubicación desconocida"}
-                      {" · "}
                       {DEVICES[r.device] ?? r.device} · {r.os} · {r.browser}
                     </p>
                     <p className="text-xs text-text-secondary/80">

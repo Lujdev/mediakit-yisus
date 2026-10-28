@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { initDb, purgeVisits } from "@/lib/db";
 
-/** Daily cron (see vercel.json): deletes visits older than 90 days. Idempotent and only removes expired data. */
+/** Daily cron (see vercel.json): deletes visits older than 30 days. Idempotent and only removes expired data. */
 export async function GET() {
   await initDb();
   await purgeVisits();

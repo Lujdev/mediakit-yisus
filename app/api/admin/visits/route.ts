@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
   const denied = requireAdmin(req);
   if (denied) return denied;
   const requested = Number(req.nextUrl.searchParams.get("days"));
-  const days = [7, 30, 90].includes(requested) ? requested : 30;
+  const days = [7, 14, 30].includes(requested) ? requested : 30;
   try {
     return NextResponse.json(await getVisitStats(days, req.nextUrl.searchParams.get("purge") !== "0"), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
