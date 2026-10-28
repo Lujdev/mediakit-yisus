@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import type { SiteMedia } from "@/lib/site-data";
 import { compressImage } from "../image";
-import { Button, PanelHeader, StatusText, useAdminRequest } from "../ui";
-import MediaManager, { FILE_INPUT } from "./MediaManager";
+import { Button, FilePicker, PanelHeader, StatusText, useAdminRequest } from "../ui";
+import MediaManager from "./MediaManager";
 
 /** Hook shared by the photo panels: the current media from the public site data. */
 export function useMedia() {
@@ -73,11 +73,11 @@ function Slot({
     <section className="rounded-xl border border-line/10 p-4 md:p-5">
       <h3 className="font-display text-2xl tracking-wide text-text-primary">{title}</h3>
       <p className="mb-4 mt-1 text-sm text-text-secondary">{description}</p>
-      <div className="flex flex-wrap items-start gap-5">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={current ?? fallback} alt={title} className="h-40 w-32 rounded-lg object-cover" />
         <div className="min-w-0 flex-1 space-y-3">
-          <input key={fileKey} type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className={FILE_INPUT} />
+          <FilePicker key={fileKey} accept="image/png,image/jpeg,image/webp" file={file} onFile={setFile} />
           {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
           <div className="flex flex-wrap items-center gap-2">
             <Button disabled={!file || busy} onClick={save}>{busy ? "Subiendo..." : "Cambiar foto"}</Button>

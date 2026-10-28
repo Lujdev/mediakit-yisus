@@ -2,7 +2,7 @@
 
 import { useContext, useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2, Upload } from "lucide-react";
-import { AuthLostContext, Button, Field, PanelHeader, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
+import { AuthLostContext, Button, Field, FilePicker, PanelHeader, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
 
 type Row = { key: number; title: string; url: string };
 let nextKey = 1;
@@ -128,14 +128,7 @@ export default function VideosPanel() {
 
       <div className="mt-6 rounded-xl border border-dashed border-line/15 p-3 md:p-4">
         <Field label="Subir video">
-          <input
-            key={fileKey}
-            type="file"
-            accept="video/*"
-            disabled={progress !== null}
-            onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])}
-            className="block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-line/10 file:px-4 file:text-text-primary"
-          />
+          <FilePicker key={fileKey} accept="video/*" file={null} showName={false} label="Elegir video" disabled={progress !== null} onFile={(f) => f && upload(f)} />
         </Field>
         {progress !== null && (
           <div className="mt-3" role="status" aria-live="polite">

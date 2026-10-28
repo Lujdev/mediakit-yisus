@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useId, useState, type ReactNode } from "react";
 
 /** Called by panels when the API answers 401 so the shell can show the login again. */
 export const AuthLostContext = createContext<() => void>(() => {});
@@ -60,6 +60,52 @@ export function Disclosure({
         />
       </button>
       {open && <div className="px-1 pb-6 pt-1">{children}</div>}
+    </div>
+  );
+}
+
+/**
+ * File chooser with a styled button and a truncated file name. The native control renders its own wide
+ * "No file chosen" text that overflows narrow cards, so the real input stays visually hidden.
+ * Remount it with a new `key` to clear the selection.
+ */
+export function FilePicker({
+  accept,
+  file,
+  onFile,
+  disabled,
+  label = "Elegir archivo",
+  showName = true,
+}: {
+  accept: string;
+  file: File | null;
+  onFile: (file: File | null) => void;
+  disabled?: boolean;
+  label?: string;
+  showName?: boolean;
+}) {
+  const id = useId();
+  return (
+    <div className="flex min-w-0 max-w-full items-center gap-3">
+      <input
+        id={id}
+        type="file"
+        accept={accept}
+        disabled={disabled}
+        onChange={(e) => onFile(e.target.files?.[0] ?? null)}
+        className="peer sr-only"
+      />
+      <label
+        htmlFor={id}
+        className="inline-flex min-h-11 shrink-0 cursor-pointer items-center rounded-full border border-line/15 px-5 text-sm font-semibold text-text-primary transition-colors hover:border-accent-ink hover:text-accent-ink peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent-ink peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+      >
+        {label}
+      </label>
+      {showName && (
+        <span className="min-w-0 flex-1 truncate text-sm text-text-secondary" title={file?.name}>
+          {file ? file.name : "Ningún archivo"}
+        </span>
+      )}
     </div>
   );
 }

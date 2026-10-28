@@ -3,10 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import type { Brand } from "@/lib/site-data";
-import { Button, Disclosure, Field, PanelHeader, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
-
-const FILE_INPUT =
-  "block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-line/10 file:px-4 file:text-text-primary";
+import { Button, Disclosure, Field, FilePicker, PanelHeader, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
 
 function LogoThumb({ src, name }: { src: string | null; name: string }) {
   return (
@@ -78,7 +75,7 @@ function BrandRow({
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <Field label={brand.logo ? "Reemplazar logo" : "Subir logo"}>
-            <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className={FILE_INPUT} />
+            <FilePicker accept="image/png,image/jpeg,image/webp" file={file} onFile={setFile} />
           </Field>
           {brand.logo && (
             <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-text-secondary">
@@ -159,7 +156,7 @@ export default function BrandsPanel() {
               </Field>
             </div>
             <Field label="Logo">
-              <input key={fileKey} type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setNewFile(e.target.files?.[0] ?? null)} className={FILE_INPUT} />
+              <FilePicker key={fileKey} accept="image/png,image/jpeg,image/webp" file={newFile} onFile={setNewFile} />
             </Field>
             <div className="flex flex-wrap items-center gap-2">
               <Button disabled={!newName.trim() || state.kind === "saving"} onClick={add}>Agregar</Button>

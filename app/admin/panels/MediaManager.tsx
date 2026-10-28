@@ -4,10 +4,7 @@ import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import type { MediaItem } from "@/lib/site-data";
 import { compressImage } from "../image";
-import { Button, Disclosure, Field, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
-
-export const FILE_INPUT =
-  "block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-line/10 file:px-4 file:text-text-primary";
+import { Button, Disclosure, Field, FilePicker, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
 
 const CATEGORIES = ["Outfit", "Moda", "Lifestyle", "Portrait", "Editorial"];
 const CATEGORY_NAMES: Record<string, string> = {
@@ -135,7 +132,7 @@ function Row({
           </Field>
         </div>
         <Field label="Reemplazar la imagen" hint="JPG, PNG o WebP. Se ajusta sola al tamaño correcto.">
-          <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className={FILE_INPUT} />
+          <FilePicker accept="image/png,image/jpeg,image/webp" file={file} onFile={setFile} />
         </Field>
         {fileError && <p role="alert" className="text-sm text-red-300">{fileError}</p>}
         <div className="flex flex-wrap items-center gap-2">
@@ -221,7 +218,7 @@ export default function MediaManager({
         {adding ? (
           <div className="space-y-4 rounded-xl border border-accent-ink/40 p-4 md:p-5">
             <Field label="Foto">
-              <input key={fileKey} type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className={FILE_INPUT} />
+              <FilePicker key={fileKey} accept="image/png,image/jpeg,image/webp" file={file} onFile={setFile} />
             </Field>
             {gallery && (
               <Field label="Categoría">
