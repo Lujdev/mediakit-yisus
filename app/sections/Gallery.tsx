@@ -1,9 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GALLERY_IMAGES, type GalleryCategory } from "../data/gallery";
 import { useLang } from "../i18n/LanguageProvider";
 import Lightbox from "../components/Lightbox";
@@ -30,6 +30,32 @@ export default function Gallery() {
 
   // Circular "view" badge that follows the mouse over photos (fine pointers only).
   const badgeRef = useRef<HTMLDivElement>(null);
+
+  // Mobile carousel arrows: step one card, and hide the arrow at either end.
+  const trackRef = useRef<HTMLUListElement>(null);
+  const [edge, setEdge] = useState({ start: true, end: false });
+  const updateEdge = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    setEdge({
+      start: el.scrollLeft <= 4,
+      end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4,
+    });
+  }, []);
+  useEffect(() => {
+    const el = trackRef.current;
+    if (el) el.scrollTo({ left: 0 });
+    updateEdge();
+    window.addEventListener("resize", updateEdge);
+    return () => window.removeEventListener("resize", updateEdge);
+  }, [filter, updateEdge]);
+  const step = (dir: 1 | -1) => {
+    const el = trackRef.current;
+    const card = el?.children[0] as HTMLElement | undefined;
+    if (!el || !card) return;
+    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollBy({ left: dir * (card.getBoundingClientRect().width + 12), behavior: smooth ? "smooth" : "auto" });
+  };
   const moveCursor = (e: React.PointerEvent) => {
     const el = cursorRef.current;
     if (!el || e.pointerType !== "mouse") return;
@@ -93,7 +119,10 @@ export default function Gallery() {
         </Reveal>
 
         {/* Mobile: snap carousel. Desktop: masonry that keeps each photo's own proportions. */}
+        <div className="relative">
         <motion.ul
+          ref={trackRef}
+          onScroll={updateEdge}
           key={filter}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -137,6 +166,24 @@ export default function Gallery() {
             </li>
           ))}
         </motion.ul>
+        {(["prev", "next"] as const).map((side) => {
+          const hidden = side === "prev" ? edge.start : edge.end;
+          return (
+            <button
+              key={side}
+              type="button"
+              aria-label={side === "prev" ? t.gallery.prev : t.gallery.next}
+              onClick={() => step(side === "prev" ? -1 : 1)}
+              tabIndex={hidden ? -1 : 0}
+              className={`absolute top-[calc(50%-1rem)] z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-bg-primary/80 text-text-primary backdrop-blur transition-opacity duration-200 md:hidden cursor-pointer ${
+                side === "prev" ? "left-1" : "right-1"
+              } ${hidden ? "pointer-events-none opacity-0" : "opacity-100"}`}
+            >
+              {side === "prev" ? <ChevronLeft size={22} aria-hidden /> : <ChevronRight size={22} aria-hidden />}
+            </button>
+          );
+        })}
+        </div>
         <p className="mt-2 text-center text-xs text-text-secondary md:hidden" aria-hidden>
           {t.gallery.swipeHint}
         </p>
