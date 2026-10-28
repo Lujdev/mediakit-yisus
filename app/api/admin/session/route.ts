@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  IGNORE_COOKIE,
   SESSION_COOKIE,
   createSessionToken,
+  ignoreCookieOptions,
   isAdmin,
   passwordMatches,
   sessionCookieOptions,
@@ -24,6 +26,8 @@ export async function POST(req: NextRequest) {
   }
   const res = NextResponse.json({ authenticated: true });
   res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions);
+  // Signing in to the admin marks this device as the owner's, so its visits are never counted.
+  res.cookies.set(IGNORE_COOKIE, "1", ignoreCookieOptions);
   return res;
 }
 

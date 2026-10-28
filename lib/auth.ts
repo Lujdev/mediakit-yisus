@@ -2,6 +2,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 export const SESSION_COOKIE = "admin_session";
+/** Marks a device whose visits must not be counted (the owner's own). Outlives the admin session. */
+export const IGNORE_COOKIE = "yisus_ignore";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 /** Dev-only fallback so local work needs no setup. Production fails closed. */
@@ -68,4 +70,12 @@ export const sessionCookieOptions = {
   secure: process.env.NODE_ENV === "production",
   path: "/",
   maxAge: SESSION_TTL_SECONDS,
+};
+
+export const ignoreCookieOptions = {
+  httpOnly: true,
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+  maxAge: 60 * 60 * 24 * 365,
 };

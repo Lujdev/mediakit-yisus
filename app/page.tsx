@@ -16,6 +16,7 @@ import { LanguageProvider, useLang } from "./i18n/LanguageProvider";
 import Ambient from "./components/Ambient";
 import LogoMark from "./components/LogoMark";
 import AttitudeBand from "./components/AttitudeBand";
+import Tracker from "./components/Tracker";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { MotionConfig } from "framer-motion";
 
@@ -26,6 +27,7 @@ function HomeContent() {
   return (
     <MotionConfig reducedMotion="user">
       <Ambient />
+      <Tracker />
       {loading && <Preloader onComplete={() => setLoading(false)} />}
       <Navigation />
       <main>

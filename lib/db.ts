@@ -111,6 +111,23 @@ async function createSchema() {
   `);
 
   await db.execute(`
+    CREATE TABLE IF NOT EXISTS visits (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      ip TEXT,
+      country TEXT,
+      city TEXT,
+      device TEXT,
+      os TEXT,
+      browser TEXT,
+      lang TEXT,
+      referrer TEXT,
+      path TEXT
+    )
+  `);
+  await db.execute("CREATE INDEX IF NOT EXISTS idx_visits_created ON visits(created_at)");
+
+  await db.execute(`
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
@@ -234,6 +251,16 @@ async function seed() {
   }
 }
 
+/** Visit records (which include IPs) are kept for 90 days and no longer. */
+export const VISIT_RETENTION_DAYS = 90;
+
+export async function purgeVisits() {
+  await db.execute({
+    sql: "DELETE FROM visits WHERE created_at < datetime('now', ?)",
+    args: [`-${VISIT_RETENTION_DAYS} days`],
+  });
+}
+
 let ready: Promise<void> | null = null;
 
 /** Creates tables and seeds defaults once per server instance. Safe to call on every request. */
@@ -243,6 +270,7 @@ export function initDb(): Promise<void> {
       await createSchema();
       await dedupe();
       await seed();
+      await purgeVisits();
     })().catch((err) => {
       ready = null; // allow a retry on the next request
       throw err;
