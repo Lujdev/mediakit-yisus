@@ -2,12 +2,23 @@
 
 import { Check, Star } from "lucide-react";
 import { useLang } from "../i18n/LanguageProvider";
+import { useSiteData } from "../data/SiteData";
 import Reveal from "../components/Reveal";
 import SectionHeader from "../components/SectionHeader";
 import SpotlightCard from "../components/SpotlightCard";
 
 export default function Services() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const data = useSiteData();
+  const packages = data?.packages.length
+    ? data.packages.map((p) => ({
+        name: p.name,
+        price: p.price,
+        popular: p.popular,
+        description: p.description[lang],
+        features: p.features[lang],
+      }))
+    : t.services.packages.map((p, i) => ({ ...p, popular: i === 0 }));
   return (
     <section id="services" className="relative py-16 md:py-36 px-4 overflow-hidden">
       <div aria-hidden className="aurora top-1/3 -right-32 h-96 w-96 bg-accent-orange/30" />
@@ -21,8 +32,8 @@ export default function Services() {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
-          {t.services.packages.map((pkg, i) => {
-            const popular = i === 0;
+          {packages.map((pkg, i) => {
+            const popular = pkg.popular;
             return (
             <Reveal key={pkg.name} delay={i * 0.12} className="h-full">
               <SpotlightCard

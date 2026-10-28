@@ -9,7 +9,9 @@ import Metrics from "./sections/Metrics";
 import Services from "./sections/Services";
 import Brands from "./sections/Brands";
 import Gallery from "./sections/Gallery";
+import Videos from "./sections/Videos";
 import Contact from "./sections/Contact";
+import { SiteDataProvider } from "./data/SiteData";
 import { LanguageProvider, useLang } from "./i18n/LanguageProvider";
 import Ambient from "./components/Ambient";
 import { MotionConfig } from "framer-motion";
@@ -30,6 +32,7 @@ function HomeContent() {
         <Services />
         <Brands />
         <Gallery />
+        <Videos />
         <Contact />
       </main>
       <footer className="border-t border-white/5 py-8 px-4">
@@ -52,7 +55,9 @@ function HomeContent() {
 export default function Home() {
   return (
     <LanguageProvider>
-      <HomeContent />
+      <SiteDataProvider>
+        <HomeContent />
+      </SiteDataProvider>
     </LanguageProvider>
   );
 }

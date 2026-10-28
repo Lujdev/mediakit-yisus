@@ -1,14 +1,18 @@
 "use client";
 
 import { useLang } from "../i18n/LanguageProvider";
-import Marquee from "../components/Marquee";
+import { useSiteData } from "../data/SiteData";
+import Marquee, { type MarqueeItem } from "../components/Marquee";
 import Reveal from "../components/Reveal";
 import SectionHeader from "../components/SectionHeader";
 
-const brands = ["COVAS", "SAMOS", "ANCDESIGN", "FVPS", "ROCKSTAR"];
+const FALLBACK: MarqueeItem[] = ["COVAS", "SAMOS", "ANCDESIGN", "FVPS", "ROCKSTAR"].map((name) => ({ name }));
 
 export default function Brands() {
   const { t } = useLang();
+  const data = useSiteData();
+  const brands: MarqueeItem[] = data?.brands.length ? data.brands : FALLBACK;
+
   return (
     <section id="brands" className="relative py-16 md:py-36 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4">
@@ -24,7 +28,7 @@ export default function Brands() {
       <Reveal>
         <div className="border-y border-white/10 py-8 md:py-10 space-y-6">
           <Marquee items={brands} className="text-text-primary" />
-          <Marquee items={brands} reverse className="text-outline" />
+          <Marquee items={brands} reverse variant="outline" className="text-outline" />
         </div>
       </Reveal>
     </section>

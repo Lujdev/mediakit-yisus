@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { dictionary, type Dict, type Lang } from "./dictionary";
 
 type Ctx = { lang: Lang; t: Dict; setLang: (l: Lang) => void };
@@ -8,18 +8,31 @@ type Ctx = { lang: Lang; t: Dict; setLang: (l: Lang) => void };
 const LanguageContext = createContext<Ctx | null>(null);
 const STORAGE_KEY = "yisus-lang";
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("es");
+// Language lives outside React so SSR renders "es" and the client switches after hydration
+// without a mismatch. memoryLang covers browsers where localStorage is blocked.
+const listeners = new Set<() => void>();
+let memoryLang: Lang | null = null;
 
-  // Resolve saved or browser language after hydration (keeps SSR markup stable).
-  useEffect(() => {
-    let next: Lang = navigator.language?.toLowerCase().startsWith("es") ? "es" : "en";
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === "es" || saved === "en") next = saved;
-    } catch {}
-    setLangState(next);
-  }, []);
+function readLang(): Lang {
+  if (memoryLang) return memoryLang;
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === "es" || saved === "en") return saved;
+  } catch {}
+  return navigator.language?.toLowerCase().startsWith("es") ? "es" : "en";
+}
+
+function subscribe(cb: () => void) {
+  listeners.add(cb);
+  window.addEventListener("storage", cb);
+  return () => {
+    listeners.delete(cb);
+    window.removeEventListener("storage", cb);
+  };
+}
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const lang = useSyncExternalStore<Lang>(subscribe, readLang, () => "es");
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -30,10 +43,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [lang]);
 
   const setLang = useCallback((l: Lang) => {
-    setLangState(l);
+    memoryLang = l;
     try {
       localStorage.setItem(STORAGE_KEY, l);
     } catch {}
+    listeners.forEach((cb) => cb());
   }, []);
 
   const value = useMemo(() => ({ lang, t: dictionary[lang], setLang }), [lang, setLang]);

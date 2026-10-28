@@ -1,37 +1,24 @@
 "use client";
 
 import { useLang } from "../i18n/LanguageProvider";
+import { useSiteData } from "../data/SiteData";
+import { DEFAULT_SETTINGS } from "@/lib/settings-defaults";
 import SectionHeader from "../components/SectionHeader";
 import { motion } from "framer-motion";
 import { Mail, MessageCircle, Phone, Send } from "lucide-react";
 import { useState } from "react";
 import InstagramIcon from "../components/InstagramIcon";
 
-const socialLinks = [
-  {
-    icon: InstagramIcon,
-    label: "@yisus_20",
-    href: "https://instagram.com/yisus_20",
-  },
-  {
-    icon: MessageCircle,
-    label: "@yisus_contreras",
-    href: "https://tiktok.com/@yisus_contreras",
-  },
-  {
-    icon: Mail,
-    label: "jesusoneiver@gmail.com",
-    href: "mailto:jesusoneiver@gmail.com",
-  },
-  {
-    icon: Phone,
-    label: "+58 424 271 7890",
-    href: "https://wa.me/584242717890",
-  },
-];
 
 export default function Contact() {
   const { t } = useLang();
+  const settings = useSiteData()?.settings ?? DEFAULT_SETTINGS;
+  const socialLinks = [
+    { icon: InstagramIcon, label: settings.instagram_label, href: settings.instagram_url },
+    { icon: MessageCircle, label: settings.tiktok_label, href: settings.tiktok_url },
+    { icon: Mail, label: settings.email, href: `mailto:${settings.email}` },
+    { icon: Phone, label: settings.whatsapp_label, href: `https://wa.me/${settings.whatsapp}` },
+  ];
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -65,7 +52,7 @@ export default function Contact() {
     <section id="contact" className="relative py-16 md:py-36 px-4">
       <div className="mx-auto max-w-7xl">
         <SectionHeader
-          index="06"
+          index="07"
           eyebrow={t.contact.eyebrow}
           title={t.contact.title}
           accentLine={1}

@@ -18,6 +18,7 @@ const es = {
       services: "Servicios",
       brands: "Marcas",
       gallery: "Galería",
+      videos: "Videos",
       contact: "Contacto",
     },
   },
@@ -115,6 +116,13 @@ const es = {
       Editorial: "Editorial",
     } as Record<string, string>,
   },
+  videos: {
+    eyebrow: "Contenido",
+    title: ["VIDEOS"],
+    description: "Piezas en movimiento: reels, TikToks y proyectos con marcas.",
+    play: "Reproducir",
+    watchOn: "Ver en",
+  },
   contact: {
     eyebrow: "Hablemos",
     title: ["TRABAJEMOS", "JUNTOS"],
@@ -176,6 +184,7 @@ const en: Dict = {
       services: "Services",
       brands: "Brands",
       gallery: "Gallery",
+      videos: "Videos",
       contact: "Contact",
     },
   },
@@ -272,6 +281,13 @@ const en: Dict = {
       Portrait: "Portrait",
       Editorial: "Editorial",
     },
+  },
+  videos: {
+    eyebrow: "Content",
+    title: ["VIDEOS"],
+    description: "Content in motion: reels, TikToks and brand projects.",
+    play: "Play",
+    watchOn: "Watch on",
   },
   contact: {
     eyebrow: "Let's talk",

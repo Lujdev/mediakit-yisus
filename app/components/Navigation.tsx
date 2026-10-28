@@ -4,12 +4,15 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useLang } from "../i18n/LanguageProvider";
+import { useSiteData } from "../data/SiteData";
 import LanguageToggle from "./LanguageToggle";
 
-const sections = ["hero", "about", "metrics", "services", "brands", "gallery", "contact"] as const;
+const ALL_SECTIONS = ["hero", "about", "metrics", "services", "brands", "gallery", "videos", "contact"] as const;
 
 export default function Navigation() {
   const { t } = useLang();
+  const hasVideos = Boolean(useSiteData()?.videos.length);
+  const sections = ALL_SECTIONS.filter((id) => id !== "videos" || hasVideos);
   const navLinks = sections.map((id) => ({ label: t.nav.links[id], href: `#${id}` }));
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,7 +37,8 @@ export default function Navigation() {
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasVideos]);
 
   return (
     <motion.nav
