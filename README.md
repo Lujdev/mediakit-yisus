@@ -12,7 +12,7 @@ MediaKit web interactivo y de alto impacto visual para **Yisus Contreras** (@yis
 - **Hero** con tipografía grande y gradiente lime → naranja
 - **Secciones:** Sobre mí, Métricas, Servicios, Marcas, Galería, Contacto
 - **Métricas animadas** con contadores que suben al hacer scroll
-- **Panel de administración** en `/admin` para editar métricas
+- **Panel de administración** (ruta secreta, ver abajo) para editar métricas
 - **Formulario de contacto** conectado a API
 - **Diseño responsive** mobile-first
 
@@ -41,10 +41,11 @@ MediaKit web interactivo y de alto impacto visual para **Yisus Contreras** (@yis
 
 ## Admin Panel
 
-- URL: `/admin`
+- URL: `/<ADMIN_PATH>`. La ruta se define con la variable de entorno `ADMIN_PATH` (por defecto `yc-studio`); `/admin` devuelve 404. Es oscuridad adicional: la protección real es la sesión del servidor.
 - Auth: contraseña definida en la variable de entorno `ADMIN_PASSWORD` (sesión en cookie httpOnly firmada, 7 días). En producción, sin esa variable el login queda bloqueado. En local, sin variable, se usa una contraseña de desarrollo.
 - Opcional: `ADMIN_SESSION_SECRET` para firmar la sesión con un secreto distinto.
-- Pestañas: Métricas, Marcas (logos), Tarifas (ES/EN), Redes, Videos, Contactos.
+- Pestañas: Métricas, Visitas, Marcas (logos), Tarifas (ES/EN), Videos, Redes, Mensajes.
+- Visitas: guarda IP, país, dispositivo, navegador, idioma y origen **90 días** (se borran solas: al arrancar, en cada visita con baja probabilidad, al abrir la pestaña y con un cron diario en `vercel.json`). No cuenta bots, recargas repetidas (30 min) ni los dispositivos donde inicias sesión en el admin.
 - Logos: al subir una imagen con fondo blanco, el fondo se elimina automáticamente (`lib/logo.ts`). El sitio los muestra en blanco.
 - Videos: enlaces de YouTube (se reproducen en el sitio), TikTok/Instagram (abren en su app) o `.mp4` directo. Sin videos, la sección no aparece.
 - Contenido editable (marcas, tarifas, redes, videos) vive en la base de datos (Turso en producción) y se siembra con valores por defecto la primera vez.

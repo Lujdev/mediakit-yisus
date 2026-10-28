@@ -10,7 +10,7 @@ export type Shot = { src: string; caption: L };
 
 /**
  * Figures transcribed from the analytics screenshots in public/metricas (captured 22 Oct).
- * The headline numbers come from the database (editable in /admin); this extra detail is static.
+ * The headline numbers come from the database (editable in the admin panel); this extra detail is static.
  */
 export const PERIOD: Record<string, L> = {
   instagram: { es: "23 sep – 22 oct · 30 días", en: "Sep 23 – Oct 22 · 30 days" },
