@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { db, initDb, purgeVisits } from "./db";
+import { detectSource } from "./source";
 import { parseUserAgent } from "./ua";
 
 /** First client IP from the proxy headers (Vercel sets x-forwarded-for). */
@@ -12,7 +13,10 @@ export function clientIp(req: NextRequest): string | null {
 const clip = (v: unknown, max: number) => (typeof v === "string" && v ? v.slice(0, max) : null);
 
 /** Stores one visit unless it is a bot or the same visitor already hit the same path in the last 30 minutes. */
-export async function recordVisit(req: NextRequest, body: { path?: unknown; referrer?: unknown; lang?: unknown }) {
+export async function recordVisit(
+  req: NextRequest,
+  body: { path?: unknown; referrer?: unknown; lang?: unknown; tag?: unknown }
+) {
   const ua = parseUserAgent(req.headers.get("user-agent") ?? "");
   if (ua.bot) return;
 
@@ -30,6 +34,8 @@ export async function recordVisit(req: NextRequest, body: { path?: unknown; refe
     } catch {}
   }
 
+  const source = detectSource(clip(body.tag, 40), referrer, req.headers.get("user-agent") ?? "");
+
   // Approximate place from the IP, resolved by Vercel at the edge (no third-party lookup, nothing leaves your stack).
   const country = clip(req.headers.get("x-vercel-ip-country"), 2);
   let city: string | null = null;
@@ -39,16 +45,17 @@ export async function recordVisit(req: NextRequest, body: { path?: unknown; refe
 
   const recent = await db.execute({
     sql: `SELECT 1 FROM visits
-          WHERE ip IS ? AND os = ? AND browser = ? AND path IS ? AND created_at > datetime('now', '-30 minutes')
+          WHERE ip IS ? AND os = ? AND browser = ? AND path IS ? AND source IS ?
+            AND created_at > datetime('now', '-30 minutes')
           LIMIT 1`,
-    args: [ip, ua.os, ua.browser, path],
+    args: [ip, ua.os, ua.browser, path, source],
   });
   if (recent.rows.length > 0) return;
 
   await db.execute({
-    sql: `INSERT INTO visits (ip, country, city, device, os, browser, lang, referrer, path)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    args: [ip, country, city, ua.device, ua.os, ua.browser, clip(body.lang, 20), referrer, path],
+    sql: `INSERT INTO visits (ip, country, city, device, os, browser, lang, referrer, path, source)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [ip, country, city, ua.device, ua.os, ua.browser, clip(body.lang, 20), referrer, path, source],
   });
 
   // Keep the 90-day limit even when nobody opens the admin.
@@ -63,7 +70,7 @@ export async function getVisitStats(days: number, purge = true) {
   if (purge) await purgeVisits();
   const since = `-${days} days`;
 
-  const group = async (col: "device" | "os" | "browser" | "country" | "city" | "lang" | "referrer" | "path"): Promise<Row[]> => {
+  const group = async (col: "device" | "os" | "browser" | "country" | "city" | "lang" | "source" | "path"): Promise<Row[]> => {
     const res = await db.execute({
       sql: `SELECT COALESCE(${col}, '') AS k, COUNT(*) AS c FROM visits
             WHERE created_at >= datetime('now', ?) GROUP BY k ORDER BY c DESC LIMIT 8`,
@@ -72,7 +79,7 @@ export async function getVisitStats(days: number, purge = true) {
     return res.rows.map((r) => ({ k: String(r.k), c: Number(r.c) }));
   };
 
-  const [totals, lastRow, daily, recent, device, os, browser, country, city, lang, referrer, path] = await Promise.all([
+  const [totals, lastRow, daily, recent, device, os, browser, country, city, lang, source, path] = await Promise.all([
     db.execute({
       sql: `SELECT COUNT(*) AS visits, COUNT(DISTINCT COALESCE(ip, '') || '|' || os || '|' || browser) AS visitors
             FROM visits WHERE created_at >= datetime('now', ?)`,
@@ -85,7 +92,7 @@ export async function getVisitStats(days: number, purge = true) {
       args: [since],
     }),
     db.execute(
-      `SELECT ip, country, city, device, os, browser, lang, referrer, path, created_at
+      `SELECT ip, country, city, device, os, browser, lang, referrer, source, path, created_at
        FROM visits ORDER BY id DESC LIMIT 40`
     ),
     group("device"),
@@ -94,7 +101,7 @@ export async function getVisitStats(days: number, purge = true) {
     group("country"),
     group("city"),
     group("lang"),
-    group("referrer"),
+    group("source"),
     group("path"),
   ]);
 
@@ -111,7 +118,7 @@ export async function getVisitStats(days: number, purge = true) {
     country,
     city,
     lang,
-    referrer,
+    source,
     path,
     recent: recent.rows.map((r) => ({
       ip: r.ip ? String(r.ip) : null,
@@ -122,6 +129,7 @@ export async function getVisitStats(days: number, purge = true) {
       browser: String(r.browser ?? ""),
       lang: r.lang ? String(r.lang) : null,
       referrer: r.referrer ? String(r.referrer) : null,
+      source: r.source ? String(r.source) : "Directo",
       path: String(r.path ?? "/"),
       // SQLite stores UTC without a zone marker.
       at: `${String(r.created_at).replace(" ", "T")}Z`,

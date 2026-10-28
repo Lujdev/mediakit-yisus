@@ -121,9 +121,14 @@ async function createSchema() {
       browser TEXT,
       lang TEXT,
       referrer TEXT,
-      path TEXT
+      path TEXT,
+      source TEXT
     )
   `);
+  // Databases created before channel detection lack this column; adding it twice is a harmless error.
+  try {
+    await db.execute("ALTER TABLE visits ADD COLUMN source TEXT");
+  } catch {}
   await db.execute("CREATE INDEX IF NOT EXISTS idx_visits_created ON visits(created_at)");
 
   await db.execute(`

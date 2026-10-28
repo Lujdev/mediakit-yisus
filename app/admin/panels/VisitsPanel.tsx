@@ -13,6 +13,7 @@ type Recent = {
   browser: string;
   lang: string | null;
   referrer: string | null;
+  source: string;
   path: string;
   at: string;
 };
@@ -28,7 +29,7 @@ type Stats = {
   country: Row[];
   city: Row[];
   lang: Row[];
-  referrer: Row[];
+  source: Row[];
   path: Row[];
   recent: Recent[];
 };
@@ -72,6 +73,58 @@ function BarList({ title, rows, label }: { title: string; rows: Row[]; label?: (
         </ul>
       )}
     </section>
+  );
+}
+
+const CHANNEL_LINKS = [
+  { name: "Instagram", tag: "instagram", where: "bio de Instagram" },
+  { name: "TikTok", tag: "tiktok", where: "bio de TikTok" },
+  { name: "WhatsApp", tag: "whatsapp", where: "estado, catálogo o mensajes" },
+];
+
+/** Tagged links: the reliable way to know a visit came from a given social network. */
+function ChannelLinks() {
+  const [copied, setCopied] = useState<string | null>(null);
+  const origin = typeof window === "undefined" ? "" : window.location.origin;
+
+  const copy = async (tag: string) => {
+    try {
+      await navigator.clipboard.writeText(`${origin}/?utm_source=${tag}`);
+      setCopied(tag);
+      setTimeout(() => setCopied(null), 2000);
+    } catch {}
+  };
+
+  return (
+    <details className="mb-8 rounded-xl border border-line/10 px-4 py-1 text-sm md:px-5">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between font-medium text-text-primary">
+        Enlaces para medir desde qué red llegan
+        <span aria-hidden className="text-text-secondary">+</span>
+      </summary>
+      <div className="space-y-4 pb-4 text-text-secondary">
+        <p>
+          Instagram y TikTok no siempre avisan de dónde viene la gente, y WhatsApp casi nunca. Con un enlace etiquetado
+          lo sabemos seguro: pon cada uno en su red.
+        </p>
+        <ul className="divide-y divide-line/10">
+          {CHANNEL_LINKS.map((c) => (
+            <li key={c.tag} className="flex flex-wrap items-center gap-3 py-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-text-primary">{c.name} <span className="text-text-secondary">· {c.where}</span></p>
+                <p className="truncate font-mono text-xs">{origin}/?utm_source={c.tag}</p>
+              </div>
+              <Button variant="ghost" onClick={() => copy(c.tag)}>{copied === c.tag ? "Copiado ✓" : "Copiar"}</Button>
+            </li>
+          ))}
+        </ul>
+        <p>
+          <strong className="text-text-primary">Para probarlo:</strong> abre uno de estos enlaces en una ventana de
+          incógnito o desde otro teléfono (este dispositivo no cuenta si entras al admin desde él) y en unos segundos
+          verás la visita aparecer arriba con ese origen. Sin etiqueta, el panel igual detecta Google, YouTube, Facebook
+          y el navegador interno de Instagram, TikTok y Facebook.
+        </p>
+      </div>
+    </details>
   );
 }
 
@@ -204,6 +257,8 @@ export default function VisitsPanel() {
         )}
       </div>
 
+      <ChannelLinks />
+
       <div className="mb-3 flex flex-wrap items-center gap-3 text-sm">
         <span className="flex items-center gap-2 text-text-secondary" role="status" aria-live="off">
           <span className="relative flex h-2.5 w-2.5">
@@ -272,7 +327,7 @@ export default function VisitsPanel() {
             <BarList title="País" rows={stats.country} label={(k) => (k ? countryName(k) : "Desconocido")} />
             <BarList title="Ciudad (aprox.)" rows={stats.city} label={(k) => k || "Desconocida"} />
             <BarList title="Idioma del navegador" rows={stats.lang} label={(k) => k || "—"} />
-            <BarList title="Origen" rows={stats.referrer} label={(k) => k || "Directo"} />
+            <BarList title="Origen (red o sitio)" rows={stats.source} label={(k) => k || "Directo"} />
           </div>
 
           <section>
@@ -308,7 +363,7 @@ export default function VisitsPanel() {
                       {DEVICES[r.device] ?? r.device} · {r.os} · {r.browser}
                     </p>
                     <p className="text-xs text-text-secondary/80">
-                      {r.referrer ? `desde ${r.referrer}` : "acceso directo"} · {r.path}
+                      {r.source === "Directo" ? "acceso directo" : `desde ${r.source}`}{r.referrer ? ` (${r.referrer})` : ""} · {r.path}
                       {r.lang ? ` · ${r.lang}` : ""}
                     </p>
                   </li>
