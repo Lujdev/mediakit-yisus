@@ -5,11 +5,13 @@ type MarqueeProps = {
   reverse?: boolean;
   /** "logo" renders white-tinted logos when available; "outline" renders names as outlined text. */
   variant?: "logo" | "outline";
+  /** Editorial italic serif phrases instead of the condensed display face. */
+  serif?: boolean;
   className?: string;
 };
 
 /** Infinite CSS marquee. Duplicated track, paused on hover, static under reduced motion. */
-export default function Marquee({ items, reverse = false, variant = "logo", className = "" }: MarqueeProps) {
+export default function Marquee({ items, reverse = false, variant = "logo", serif = false, className = "" }: MarqueeProps) {
   // Few items would leave visible gaps in the loop, so repeat them to fill the track.
   const repeats = items.length >= 6 ? 1 : Math.ceil(6 / Math.max(items.length, 1));
   const filled = Array.from({ length: repeats }, () => items).flat();
@@ -30,7 +32,7 @@ export default function Marquee({ items, reverse = false, variant = "logo", clas
               className="h-10 md:h-14 w-auto max-w-[220px] md:max-w-[300px] object-contain opacity-80 hover:opacity-100 transition-opacity logo-silhouette"
             />
           ) : (
-            <span className="font-display text-5xl md:text-7xl tracking-wide">{item.name}</span>
+            <span className={serif ? "font-serif text-5xl italic md:text-7xl" : "font-display text-5xl md:text-7xl tracking-wide"}>{item.name}</span>
           )}
           <span aria-hidden className="h-8 w-px bg-line/20 md:h-12" />
         </li>

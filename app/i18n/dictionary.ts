@@ -25,6 +25,7 @@ const es = {
     },
   },
   preloader: "Cargando actitud",
+  band: ["Cargando actitud", "Moda", "Lifestyle", "Styling", "Yisus Contreras"],
   preloaderSpin: "Girar el logo",
   hero: {
     badge: "Content Creator · Venezuela",
@@ -209,6 +210,7 @@ const en: Dict = {
     },
   },
   preloader: "Loading attitude",
+  band: ["Loading attitude", "Fashion", "Lifestyle", "Styling", "Yisus Contreras"],
   preloaderSpin: "Spin the logo",
   hero: {
     badge: "Content Creator · Venezuela",

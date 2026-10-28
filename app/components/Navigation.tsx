@@ -60,7 +60,7 @@ export default function Navigation() {
       >
         <div className="flex h-14 items-center justify-between">
           <a href="#hero" aria-label="Yisus Contreras" className="inline-flex h-11 items-center cursor-pointer">
-            <LogoMark className="h-9" />
+            <LogoMark className="h-9" glint />
           </a>
 
           <div className="hidden md:flex items-center gap-1">

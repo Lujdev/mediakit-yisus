@@ -14,7 +14,7 @@ export default function Brands() {
   const brands: MarqueeItem[] = data?.brands.length ? data.brands : FALLBACK;
 
   return (
-    <section id="brands" className="relative py-16 md:py-36 overflow-hidden">
+    <section id="brands" className="relative bg-bg-secondary/50 py-16 md:py-36 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4">
         <SectionHeader
           index="04"

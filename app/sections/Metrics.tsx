@@ -134,7 +134,7 @@ export default function Metrics() {
   const parseValue = (val: string): number => parseFloat(val.replace(/[^0-9.]/g, "")) || 0;
 
   return (
-    <section id="metrics" className="relative py-16 md:py-36 px-4">
+    <section id="metrics" className="relative bg-bg-secondary/50 py-16 md:py-36 px-4">
       <div className="mx-auto max-w-7xl">
         <SectionHeader
           index="02"
@@ -171,7 +171,11 @@ export default function Metrics() {
                   const head = (
                     <>
                       <span className="order-1 font-display text-6xl md:text-8xl leading-none text-text-primary">
-                        {loading ? "…" : <AnimatedCounter value={parseValue(metric.value)} />}
+                        {loading ? (
+                          <span className="font-serif text-2xl italic text-text-secondary md:text-3xl">{t.preloader}…</span>
+                        ) : (
+                          <AnimatedCounter value={parseValue(metric.value)} />
+                        )}
                       </span>
                       <span className="order-2 flex items-center gap-3 text-sm md:text-base text-text-secondary">
                         {t.metrics.labels[key] ?? metric.label}

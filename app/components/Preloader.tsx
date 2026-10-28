@@ -10,6 +10,7 @@ import {
 } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useLang } from "../i18n/LanguageProvider";
+import LogoDraw from "./LogoDraw";
 
 const ease = [0.76, 0, 0.24, 1] as const;
 
@@ -83,22 +84,14 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
               onClick={() => setBurst((b) => b + 1)}
               aria-label={t.preloaderSpin}
               style={{ rotateX: tiltX, rotateY: tiltY }}
-              className="relative aspect-[458/480] w-[64vw] max-w-[400px] cursor-pointer"
+              className="relative aspect-[588/480] w-[64vw] max-w-[400px] cursor-pointer"
             >
-              {/* Focus pull: sharpness and brightness follow progress. */}
+              {/* Chalk outline traces each letter, then the fill comes in. */}
+              <LogoDraw progress={progress} className="absolute inset-0 h-full w-full" />
+              {/* Once finished, a glint keeps sweeping across (and a faster one on each tap). */}
               <span
                 aria-hidden
-                className="logo-mark absolute inset-0"
-                style={{
-                  filter: `blur(${((1 - progress) * 16).toFixed(1)}px)`,
-                  opacity: 0.25 + progress * 0.75,
-                  transform: `scale(${0.94 + progress * 0.06})`,
-                }}
-              />
-              {/* Continuous glint, plus a faster one each time it is tapped. */}
-              <span
-                aria-hidden
-                className="logo-mark glint absolute inset-0 animate-[glint_2.4s_ease-in-out_infinite]"
+                className={`logo-mark glint absolute inset-0 animate-[glint_2.4s_ease-in-out_infinite] transition-opacity duration-500 ${progress > 0.97 ? "opacity-100" : "opacity-0"}`}
                 style={{ backgroundColor: "transparent", backgroundImage: GLINT, backgroundSize: "260% 100%", backgroundRepeat: "no-repeat" }}
               />
               {burst > 0 && (

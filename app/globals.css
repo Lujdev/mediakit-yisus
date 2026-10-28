@@ -13,21 +13,23 @@
   --accent-ink: 212 242 58;
   --on-accent: 10 10 10;
   --line: 255 255 255;
+  --logo: 212 242 58;
   --logo-invert: 1;
   color-scheme: dark;
 }
 
-/* Warm cream paper + ink text; lime stays a fill, deep olive carries lime-coloured text. */
+/* Light: cream paper, ink text, butter-yellow fills (his yellow tee) and brick-red text accents (the brick wall, the cap). */
 :root[data-theme="light"] {
   --bg-primary: 251 248 242;
-  --bg-secondary: 240 234 223;
+  --bg-secondary: 243 233 223;
   --text-primary: 23 21 15;
   --text-secondary: 92 87 80;
-  --accent-lime: 205 236 45;
+  --accent-lime: 244 229 138;
   --accent-orange: 255 122 61;
-  --accent-ink: 75 93 0;
-  --on-accent: 10 10 10;
+  --accent-ink: 166 61 34;
+  --on-accent: 23 21 15;
   --line: 23 20 15;
+  --logo: 23 21 15;
   --logo-invert: 0;
   color-scheme: light;
 }
@@ -147,8 +149,8 @@ body {
 /* The YC monogram painted with the current ink colour (single PNG for both themes). */
 .logo-mark {
   display: inline-block;
-  aspect-ratio: 458 / 480;
-  background-color: rgb(var(--accent-ink));
+  aspect-ratio: 588 / 480;
+  background-color: rgb(var(--logo));
   -webkit-mask: url("/logo-yc.png") center / contain no-repeat;
   mask: url("/logo-yc.png") center / contain no-repeat;
 }
@@ -162,6 +164,17 @@ body {
 @keyframes glint {
   0% { background-position: 130% 0; }
   55%, 100% { background-position: -30% 0; }
+}
+
+/* Same sheen, but it only moves for the first ~12% of the cycle (a quick pass every few seconds). */
+@keyframes glint-rare {
+  0% { background-position: 130% 0; }
+  12%, 100% { background-position: -30% 0; }
+}
+
+@keyframes dot-blink {
+  0%, 80%, 100% { opacity: 0.2; }
+  40% { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

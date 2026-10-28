@@ -47,7 +47,7 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
   return (
     <div data-theme="dark" className="flex min-h-screen items-center justify-center bg-bg-primary px-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-5">
-        <Image src="/logo-yc.png" alt="Yisus Contreras" width={458} height={480} className="mx-auto h-20 w-auto" priority />
+        <Image src="/logo-yc.png" alt="Yisus Contreras" width={588} height={480} className="mx-auto h-20 w-auto" priority />
         <p className="text-center font-mono text-xs uppercase tracking-widest text-text-secondary">Panel</p>
         <label className="block">
           <span className="sr-only">Contraseña</span>
@@ -98,7 +98,7 @@ export default function AdminPage() {
         <header className="sticky top-0 z-20 border-b border-line/10 bg-bg-primary/90 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
             <div className="flex items-center gap-3">
-              <Image src="/logo-yc.png" alt="Yisus Contreras" width={458} height={480} className="h-9 w-auto" />
+              <Image src="/logo-yc.png" alt="Yisus Contreras" width={588} height={480} className="h-9 w-auto" />
               <span className="font-mono text-xs uppercase tracking-widest text-text-secondary">Panel</span>
             </div>
             <div className="flex items-center gap-1">
