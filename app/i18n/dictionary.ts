@@ -23,6 +23,8 @@ const es = {
     },
   },
   preloader: "Cargando actitud",
+  preloaderHint: "Mueve o toca el logo",
+  preloaderSpin: "Girar el logo",
   hero: {
     badge: "Content Creator · Venezuela",
     tagline: "Moda · Lifestyle · Storytelling · Contenido para marcas",
@@ -204,6 +206,8 @@ const en: Dict = {
     },
   },
   preloader: "Loading attitude",
+  preloaderHint: "Move or tap the logo",
+  preloaderSpin: "Spin the logo",
   hero: {
     badge: "Content Creator · Venezuela",
     tagline: "Fashion · Lifestyle · Storytelling · Content for brands",

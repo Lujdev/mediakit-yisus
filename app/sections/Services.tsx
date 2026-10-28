@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUpRight } from "lucide-react";
+import { useState } from "react";
 import { useLang } from "../i18n/LanguageProvider";
 import { useSiteData } from "../data/SiteData";
 import Reveal from "../components/Reveal";
@@ -9,6 +10,8 @@ import SectionHeader from "../components/SectionHeader";
 export default function Services() {
   const { t, lang } = useLang();
   const data = useSiteData();
+  // Row under the pointer/focus. While one is active it wins over the default "popular" highlight.
+  const [active, setActive] = useState<number | null>(null);
   const packages = data?.packages.length
     ? data.packages.map((p) => ({
         name: p.name,
@@ -33,16 +36,22 @@ export default function Services() {
         {/* Price list: ruled rows that flood with lime on hover; the popular one is always lit. */}
         <ul className="border-b border-white/10">
           {packages.map((pkg, i) => {
-            const lit = pkg.popular;
-            const main = lit ? "text-bg-primary" : "text-text-primary group-hover:text-bg-primary";
-            const soft = lit ? "text-bg-primary/70" : "text-text-secondary group-hover:text-bg-primary/70";
+            const lit = active === null ? pkg.popular : active === i;
+            const main = lit ? "text-bg-primary" : "text-text-primary";
+            const soft = lit ? "text-bg-primary/70" : "text-text-secondary";
             return (
               <Reveal key={pkg.name} delay={i * 0.08}>
-                <li className="group relative isolate overflow-hidden border-t border-white/10">
+                <li
+                  onMouseEnter={() => setActive(i)}
+                  onMouseLeave={() => setActive(null)}
+                  onFocusCapture={() => setActive(i)}
+                  onBlurCapture={() => setActive(null)}
+                  className="relative isolate overflow-hidden border-t border-white/10"
+                >
                   <span
                     aria-hidden
                     className={`absolute inset-0 -z-10 origin-bottom bg-accent-lime transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                      lit ? "scale-y-100" : "scale-y-0 group-hover:scale-y-100 group-focus-within:scale-y-100"
+                      lit ? "scale-y-100" : "scale-y-0"
                     }`}
                   />
                   {pkg.popular && (
@@ -67,7 +76,7 @@ export default function Services() {
                         <li key={feature} className="flex gap-3">
                           <span
                             aria-hidden
-                            className={`transition-colors ${lit ? "text-bg-primary" : "text-accent-lime group-hover:text-bg-primary"}`}
+                            className={`transition-colors ${lit ? "text-bg-primary" : "text-accent-lime"}`}
                           >
                             —
                           </span>
@@ -81,7 +90,7 @@ export default function Services() {
                         className={`font-display text-8xl md:text-9xl leading-none transition-colors ${
                           lit
                             ? "text-bg-primary"
-                            : "text-transparent [-webkit-text-stroke:1.5px_rgba(245,245,240,0.55)] group-hover:text-bg-primary group-hover:[-webkit-text-stroke:0]"
+                            : "text-transparent [-webkit-text-stroke:1.5px_rgba(245,245,240,0.55)]"
                         }`}
                       >
                         {pkg.price}
@@ -91,7 +100,7 @@ export default function Services() {
                         className={`inline-flex min-h-12 items-center gap-2 rounded-full px-6 font-semibold transition-colors cursor-pointer ${
                           lit
                             ? "bg-bg-primary text-accent-lime"
-                            : "bg-text-primary text-bg-primary group-hover:bg-bg-primary group-hover:text-accent-lime"
+                            : "bg-text-primary text-bg-primary"
                         }`}
                       >
                         {t.services.cta}
