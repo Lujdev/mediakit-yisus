@@ -12,7 +12,10 @@ export function clientIp(req: NextRequest): string | null {
 
 const clip = (v: unknown, max: number) => (typeof v === "string" && v ? v.slice(0, max) : null);
 
-/** Stores one visit unless it is a bot or the same visitor already hit the same path in the last 30 minutes. */
+/** A returning visitor counts again after this many minutes (the client uses the same window). */
+const DEDUPE_MINUTES = 15;
+
+/** Stores one visit unless it is a bot or the same visitor already hit the same path within DEDUPE_MINUTES. */
 export async function recordVisit(
   req: NextRequest,
   body: { path?: unknown; referrer?: unknown; lang?: unknown; tag?: unknown }
@@ -46,9 +49,9 @@ export async function recordVisit(
   const recent = await db.execute({
     sql: `SELECT 1 FROM visits
           WHERE ip IS ? AND os = ? AND browser = ? AND path IS ? AND source IS ?
-            AND created_at > datetime('now', '-30 minutes')
+            AND created_at > datetime('now', ?)
           LIMIT 1`,
-    args: [ip, ua.os, ua.browser, path, source],
+    args: [ip, ua.os, ua.browser, path, source, `-${DEDUPE_MINUTES} minutes`],
   });
   if (recent.rows.length > 0) return;
 
