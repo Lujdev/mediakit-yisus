@@ -157,7 +157,7 @@ export default function Gallery() {
                 onClick={() => setOpen(i)}
                 onPointerEnter={(e) => e.pointerType === "mouse" && showCursor(true)}
                 onPointerLeave={() => showCursor(false)}
-                aria-label={`${t.gallery.viewLarge}: ${img.alt[lang]}`}
+                aria-label={`${label(img.category)} ${pad(i + 1)}/${pad(images.length)} · ${t.gallery.viewLarge}: ${img.alt[lang]}`}
                 className="group relative block w-full overflow-hidden rounded-2xl cursor-pointer md:cursor-none"
               >
                 <div className="relative aspect-[4/5] md:aspect-auto">
@@ -173,7 +173,7 @@ export default function Gallery() {
                 </div>
                 <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-20">
                   <span className="font-display text-3xl leading-none tracking-wide text-text-primary md:text-4xl">
-                    {label(img.category)}
+                    {label(img.category)}{" "}
                   </span>
                   <span className="font-mono text-[11px] tracking-widest text-accent-ink">
                     {pad(i + 1)}/{pad(images.length)}

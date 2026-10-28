@@ -36,6 +36,7 @@ export default function Hero() {
           alt=""
           fill
           priority
+          quality={40}
           sizes="100vw"
           className="object-cover object-center opacity-40"
         />
@@ -47,16 +48,11 @@ export default function Hero() {
         style={{ y: titleY, opacity: fade }}
         className="relative z-10 text-center px-4 max-w-6xl mx-auto pt-20"
       >
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease }}
-          className="mb-8 flex items-center justify-center gap-4 text-[13px] md:text-sm font-medium tracking-[0.18em] uppercase text-text-primary/80 [text-shadow:0_1px_14px_rgba(0,0,0,0.7)]"
-        >
+        <p className="mb-8 flex items-center justify-center gap-4 text-[13px] md:text-sm font-medium tracking-[0.18em] uppercase text-text-primary/80 [text-shadow:0_1px_14px_rgba(0,0,0,0.7)]">
           <span aria-hidden className="h-px w-8 md:w-12 bg-text-primary/40" />
           {t.hero.badge}
           <span aria-hidden className="h-px w-8 md:w-12 bg-text-primary/40" />
-        </motion.p>
+        </p>
 
         <h1 className="font-display text-[26vw] sm:text-[18vw] md:text-[13rem] leading-[0.82] tracking-tight mb-8">
           {["YISUS", "CONTRERAS"].map((word, i) => (
@@ -114,7 +110,7 @@ export default function Hero() {
       {/* Scroll cue */}
       <motion.a
         href="#about"
-        aria-label={t.hero.scrollAria}
+        aria-label={`${t.hero.scroll} — ${t.hero.scrollAria}`}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-text-secondary hover:text-accent-ink transition-colors cursor-pointer"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, y: [0, 8, 0] }}

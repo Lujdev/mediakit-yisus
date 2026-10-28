@@ -70,12 +70,15 @@ export default function About() {
             {/* Editorial index: numbered rows divided by hairlines, no cards or icons. */}
             <ol className="border-b border-line/10">
               {t.about.pillars.map((pillar, i) => (
-                <Reveal key={pillar.title} delay={i * 0.06}>
-                  <li className="group relative grid grid-cols-[2.5rem_1fr] md:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,1.1fr)] gap-x-3 gap-y-1 border-t border-line/10 py-5 md:py-6 md:items-baseline">
-                    <span
-                      aria-hidden
-                      className="absolute left-0 top-0 h-px w-full origin-left scale-x-0 bg-accent-ink transition-transform duration-500 group-hover:scale-x-100"
-                    />
+                <li key={pillar.title} className="group relative border-t border-line/10 py-5 md:py-6">
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-0 h-px w-full origin-left scale-x-0 bg-accent-ink transition-transform duration-500 group-hover:scale-x-100"
+                  />
+                  <Reveal
+                    delay={i * 0.06}
+                    className="grid grid-cols-[2.5rem_1fr] gap-x-3 gap-y-1 md:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,1.1fr)] md:items-baseline"
+                  >
                     <span className="font-mono text-xs tracking-widest text-text-secondary pt-2 md:pt-0">
                       {String(i + 1).padStart(2, "0")}
                     </span>
@@ -85,8 +88,8 @@ export default function About() {
                     <p className="col-start-2 md:col-start-3 text-text-secondary text-sm md:text-base leading-relaxed">
                       {pillar.desc}
                     </p>
-                  </li>
-                </Reveal>
+                  </Reveal>
+                </li>
               ))}
             </ol>
           </div>

@@ -34,18 +34,20 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const controls = animate(0, 100, {
-      duration: 2.8,
+      duration: 1.05,
       ease: [0.65, 0, 0.35, 1],
       onUpdate: (v) => setCount(Math.round(v)),
       onComplete: () => {
-        timer = setTimeout(() => setVisible(false), 450);
+        timer = setTimeout(() => setVisible(false), 100);
       },
     });
-    document.body.style.overflow = "hidden";
+    // Phones skip the intro: it is hidden below md, so locking the scroll would only freeze the page.
+    const lockScroll = window.matchMedia("(min-width: 768px)").matches;
+    if (lockScroll) document.body.style.overflow = "hidden";
     return () => {
       controls.stop();
       if (timer) clearTimeout(timer);
-      document.body.style.overflow = "";
+      if (lockScroll) document.body.style.overflow = "";
     };
   }, []);
 
@@ -69,9 +71,9 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
           role="status"
           data-theme="dark"
           aria-label={`${t.preloader} ${count}%`}
-          className="fixed inset-0 z-[80] flex flex-col justify-between overflow-hidden bg-bg-primary p-5 md:p-10"
+          className="fixed inset-0 z-[80] hidden flex-col justify-between overflow-hidden bg-bg-primary p-5 md:flex md:p-10"
           exit={{ y: "-100%" }}
-          transition={{ duration: 0.9, ease }}
+          transition={{ duration: 0.5, ease }}
         >
           <div className="flex items-start justify-between font-serif text-lg italic text-text-secondary md:text-2xl">
             <span>Yisus Contreras</span>

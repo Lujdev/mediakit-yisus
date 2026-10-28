@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { useLang } from "../i18n/LanguageProvider";
@@ -40,14 +41,18 @@ export default function Services() {
             const main = lit ? "text-on-accent" : "text-text-primary";
             const soft = lit ? "text-on-accent/70" : "text-text-secondary";
             return (
-              <Reveal key={pkg.name} delay={i * 0.08}>
-                <li
-                  onMouseEnter={() => setActive(i)}
-                  onMouseLeave={() => setActive(null)}
-                  onFocusCapture={() => setActive(i)}
-                  onBlurCapture={() => setActive(null)}
-                  className="relative isolate overflow-hidden border-t border-line/10"
-                >
+              <motion.li
+                key={pkg.name}
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.7, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                onMouseEnter={() => setActive(i)}
+                onMouseLeave={() => setActive(null)}
+                onFocusCapture={() => setActive(i)}
+                onBlurCapture={() => setActive(null)}
+                className="relative isolate overflow-hidden border-t border-line/10"
+              >
                   <span
                     aria-hidden
                     className={`absolute inset-0 -z-10 origin-bottom bg-accent-lime transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
@@ -108,8 +113,7 @@ export default function Services() {
                       </a>
                     </div>
                   </div>
-                </li>
-              </Reveal>
+              </motion.li>
             );
           })}
         </ul>
