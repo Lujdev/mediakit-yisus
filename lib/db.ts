@@ -20,7 +20,6 @@ export { db };
 export { DEFAULT_SETTINGS };
 
 const DEFAULT_BRANDS = [
-  { name: "HERO", logo_url: "/brands/hero.png" },
   { name: "COVAS", logo_url: "/brands/covas.png" },
   { name: "SAMOS", logo_url: "/brands/samos.png" },
   { name: "ROCKSTAR", logo_url: "/brands/rockstar.png" },

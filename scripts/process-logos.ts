@@ -3,7 +3,6 @@ import { processLogo } from "../lib/logo";
 
 // Source file in public/images -> processed transparent PNG in public/brands
 const logos: Record<string, string> = {
-  "hero_logo.webp": "hero.png",
   "logo_covas.png": "covas.png",
   "logo_rockstart.png": "rockstar.png",
   "samos_logo.webp": "samos.png",
