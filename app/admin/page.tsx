@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Film, Image as ImageIcon, Lock, Mail, Share2, Tag, TrendingUp } from "lucide-react";
+import Image from "next/image";
+import { ArrowUpRight, Film, Image as ImageIcon, Mail, Share2, Tag, TrendingUp, type LucideIcon } from "lucide-react";
 import { AuthLostContext, Button, inputClass } from "./ui";
 import MetricsPanel from "./panels/MetricsPanel";
 import BrandsPanel from "./panels/BrandsPanel";
@@ -10,16 +11,14 @@ import SocialPanel from "./panels/SocialPanel";
 import VideosPanel from "./panels/VideosPanel";
 import ContactsPanel from "./panels/ContactsPanel";
 
-const TABS = [
+const TABS: { id: string; label: string; icon: LucideIcon; Panel: () => React.ReactElement }[] = [
   { id: "metrics", label: "Métricas", icon: TrendingUp, Panel: MetricsPanel },
   { id: "brands", label: "Marcas", icon: ImageIcon, Panel: BrandsPanel },
   { id: "packages", label: "Tarifas", icon: Tag, Panel: PackagesPanel },
-  { id: "social", label: "Redes", icon: Share2, Panel: SocialPanel },
   { id: "videos", label: "Videos", icon: Film, Panel: VideosPanel },
-  { id: "contacts", label: "Contactos", icon: Mail, Panel: ContactsPanel },
-] as const;
-
-type TabId = (typeof TABS)[number]["id"];
+  { id: "social", label: "Redes", icon: Share2, Panel: SocialPanel },
+  { id: "contacts", label: "Mensajes", icon: Mail, Panel: ContactsPanel },
+];
 
 function Login({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState("");
@@ -46,24 +45,23 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary flex items-center justify-center px-4">
-      <form onSubmit={submit} className="glass rounded-2xl p-8 w-full max-w-md space-y-4">
-        <div className="flex items-center gap-3 mb-2">
-          <Lock className="text-accent-lime" size={24} aria-hidden />
-          <h1 className="font-display text-3xl text-text-primary">Admin Yisus</h1>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-bg-primary px-4">
+      <form onSubmit={submit} className="w-full max-w-sm space-y-5">
+        <Image src="/logo-yc.png" alt="Yisus Contreras" width={458} height={480} className="mx-auto h-20 w-auto" priority />
+        <p className="text-center font-mono text-xs uppercase tracking-widest text-text-secondary">Panel</p>
         <label className="block">
-          <span className="block text-text-secondary text-sm mb-2">Contraseña</span>
+          <span className="sr-only">Contraseña</span>
           <input
             type="password"
             autoComplete="current-password"
             autoFocus
+            placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={inputClass}
           />
         </label>
-        {error && <p role="alert" className="text-red-300 text-sm">{error}</p>}
+        {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
         <Button type="submit" disabled={busy || !password} className="w-full">
           {busy ? "Entrando..." : "Entrar"}
         </Button>
@@ -74,7 +72,7 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
 
 export default function AdminPage() {
   const [auth, setAuth] = useState<"checking" | "in" | "out">("checking");
-  const [tab, setTab] = useState<TabId>("metrics");
+  const [tab, setTab] = useState(TABS[0].id);
 
   useEffect(() => {
     fetch("/api/admin/session", { cache: "no-store" })
@@ -96,30 +94,56 @@ export default function AdminPage() {
 
   return (
     <AuthLostContext.Provider value={authLost}>
-      <div className="min-h-screen bg-bg-primary py-8 md:py-12 px-4">
-        <div className="mx-auto max-w-4xl">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="font-display text-4xl text-text-primary">Dashboard</h1>
-            <Button variant="ghost" onClick={logout}>Cerrar sesión</Button>
-          </div>
-
-          <div role="tablist" aria-label="Secciones del admin" className="flex gap-2 mb-6 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {TABS.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                role="tab"
-                aria-selected={tab === id}
-                onClick={() => setTab(id)}
-                className={`flex min-h-11 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors cursor-pointer ${
-                  tab === id ? "bg-accent-lime text-bg-primary" : "bg-bg-secondary text-text-secondary hover:text-text-primary"
-                }`}
+      <div className="min-h-screen bg-bg-primary text-text-primary">
+        <header className="sticky top-0 z-20 border-b border-white/10 bg-bg-primary/90 backdrop-blur">
+          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+            <div className="flex items-center gap-3">
+              <Image src="/logo-yc.png" alt="Yisus Contreras" width={458} height={480} className="h-9 w-auto" />
+              <span className="font-mono text-xs uppercase tracking-widest text-text-secondary">Panel</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center gap-1 px-3 text-sm text-text-secondary transition-colors hover:text-accent-lime"
               >
-                <Icon size={16} aria-hidden /> {label}
-              </button>
-            ))}
+                Ver sitio <ArrowUpRight size={14} aria-hidden />
+              </a>
+              <Button variant="ghost" onClick={logout}>Salir</Button>
+            </div>
           </div>
+        </header>
 
-          <Active />
+        <div className="mx-auto max-w-6xl px-4 py-6 lg:grid lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-14 lg:py-10">
+          <nav
+            role="tablist"
+            aria-label="Secciones"
+            aria-orientation="vertical"
+            className="-mx-4 mb-6 flex gap-1 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:sticky lg:top-24 lg:mx-0 lg:mb-0 lg:flex-col lg:self-start lg:px-0"
+          >
+            {TABS.map(({ id, label, icon: Icon }) => {
+              const active = tab === id;
+              return (
+                <button
+                  key={id}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setTab(id)}
+                  className={`flex min-h-11 shrink-0 cursor-pointer items-center gap-3 rounded-full px-4 text-sm font-medium transition-colors lg:rounded-lg ${
+                    active ? "bg-white/10 text-text-primary" : "text-text-secondary hover:text-text-primary"
+                  }`}
+                >
+                  <Icon size={16} aria-hidden className={active ? "text-accent-lime" : ""} />
+                  {label}
+                </button>
+              );
+            })}
+          </nav>
+
+          <main role="tabpanel" className="min-w-0">
+            <Active />
+          </main>
         </div>
       </div>
     </AuthLostContext.Provider>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
-import { Button, Card, Field, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
+import { Button, Disclosure, Field, PanelHeader, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
 
 type Row = {
   key: number;
@@ -52,6 +52,10 @@ export default function PackagesPanel() {
   const update = (i: number, patch: Partial<Row>) =>
     setRows((r) => r.map((row, idx) => (idx === i ? { ...row, ...patch } : row)));
 
+  // Only one package can carry the "popular" badge.
+  const setPopular = (i: number, on: boolean) =>
+    setRows((r) => r.map((row, idx) => ({ ...row, popular: on && idx === i })));
+
   const save = () =>
     run(
       "/api/packages",
@@ -67,61 +71,70 @@ export default function PackagesPanel() {
     );
 
   return (
-    <Card>
-      <h2 className="font-display text-2xl text-text-primary mb-1">Tarifas</h2>
-      <p className="text-text-secondary text-sm mb-5">
-        Cada paquete tiene texto en español e inglés. En las características escribe una por línea.
-      </p>
+    <div>
+      <PanelHeader title="Tarifas" description="Cada paquete tiene su texto en español e inglés. Las características van una por línea." />
 
-      <div className="space-y-5">
+      <div className="rounded-xl border border-white/10 px-3 md:px-5">
         {rows.map((row, i) => (
-          <div key={row.key} className="rounded-xl border border-white/10 p-3 md:p-4 space-y-3">
-            <div className="grid grid-cols-2 md:grid-cols-[1fr_8rem_auto] gap-3 items-end">
-              <div className="col-span-2 md:col-span-1">
-                <Field label="Nombre">
-                  <input value={row.name} onChange={(e) => update(i, { name: e.target.value })} className={inputClass} />
+          <Disclosure
+            key={row.key}
+            defaultOpen={!row.name}
+            summary={
+              <span className="flex items-center justify-between gap-4">
+                <span className="flex min-w-0 items-center gap-3">
+                  <span className="truncate font-display text-2xl tracking-wide text-text-primary">{row.name || "Nuevo paquete"}</span>
+                  {row.popular && (
+                    <span className="shrink-0 bg-accent-orange px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-bg-primary">popular</span>
+                  )}
+                </span>
+                <span className="font-display text-2xl text-accent-lime">{row.price}</span>
+              </span>
+            }
+          >
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 items-end gap-4 md:grid-cols-[1fr_8rem_auto]">
+                <div className="col-span-2 md:col-span-1">
+                  <Field label="Nombre">
+                    <input value={row.name} onChange={(e) => update(i, { name: e.target.value })} className={inputClass} />
+                  </Field>
+                </div>
+                <Field label="Precio">
+                  <input value={row.price} onChange={(e) => update(i, { price: e.target.value })} className={inputClass} />
+                </Field>
+                <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-text-secondary">
+                  <input type="checkbox" checked={row.popular} onChange={(e) => setPopular(i, e.target.checked)} className="h-5 w-5 accent-[#D4F23A]" />
+                  Más popular
+                </label>
+              </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <Field label="Descripción (ES)">
+                  <input value={row.descEs} onChange={(e) => update(i, { descEs: e.target.value })} className={inputClass} />
+                </Field>
+                <Field label="Description (EN)">
+                  <input value={row.descEn} onChange={(e) => update(i, { descEn: e.target.value })} className={inputClass} />
+                </Field>
+                <Field label="Características (ES)">
+                  <textarea rows={5} value={row.featEs} onChange={(e) => update(i, { featEs: e.target.value })} className={inputClass} />
+                </Field>
+                <Field label="Features (EN)">
+                  <textarea rows={5} value={row.featEn} onChange={(e) => update(i, { featEn: e.target.value })} className={inputClass} />
                 </Field>
               </div>
-              <Field label="Precio">
-                <input value={row.price} onChange={(e) => update(i, { price: e.target.value })} className={inputClass} />
-              </Field>
-              <label className="flex min-h-11 items-center gap-2 text-sm text-text-secondary cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={row.popular}
-                  onChange={(e) => update(i, { popular: e.target.checked })}
-                  className="h-5 w-5 accent-[#D4F23A]"
-                />
-                Más popular
-              </label>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="ghost" aria-label="Subir" disabled={i === 0} onClick={() => setRows(move(rows, i, i - 1))}>
+                  <ArrowUp size={16} aria-hidden />
+                </Button>
+                <Button variant="ghost" aria-label="Bajar" disabled={i === rows.length - 1} onClick={() => setRows(move(rows, i, i + 1))}>
+                  <ArrowDown size={16} aria-hidden />
+                </Button>
+                <Button variant="danger" onClick={() => setRows(rows.filter((_, idx) => idx !== i))}>
+                  <Trash2 size={16} aria-hidden /> Quitar
+                </Button>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Field label="Descripción (ES)">
-                <input value={row.descEs} onChange={(e) => update(i, { descEs: e.target.value })} className={inputClass} />
-              </Field>
-              <Field label="Description (EN)">
-                <input value={row.descEn} onChange={(e) => update(i, { descEn: e.target.value })} className={inputClass} />
-              </Field>
-              <Field label="Características (ES)">
-                <textarea rows={5} value={row.featEs} onChange={(e) => update(i, { featEs: e.target.value })} className={inputClass} />
-              </Field>
-              <Field label="Features (EN)">
-                <textarea rows={5} value={row.featEn} onChange={(e) => update(i, { featEn: e.target.value })} className={inputClass} />
-              </Field>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="ghost" aria-label="Subir" disabled={i === 0} onClick={() => setRows(move(rows, i, i - 1))}>
-                <ArrowUp size={16} aria-hidden />
-              </Button>
-              <Button variant="ghost" aria-label="Bajar" disabled={i === rows.length - 1} onClick={() => setRows(move(rows, i, i + 1))}>
-                <ArrowDown size={16} aria-hidden />
-              </Button>
-              <Button variant="danger" onClick={() => setRows(rows.filter((_, idx) => idx !== i))}>
-                <Trash2 size={16} aria-hidden /> Quitar
-              </Button>
-            </div>
-          </div>
+          </Disclosure>
         ))}
+        {rows.length === 0 && <p className="py-6 text-sm text-text-secondary">No hay paquetes todavía.</p>}
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -129,10 +142,10 @@ export default function PackagesPanel() {
           <Plus size={16} aria-hidden /> Agregar paquete
         </Button>
         <Button disabled={state.kind === "saving"} onClick={save}>
-          {state.kind === "saving" ? "Guardando..." : "Guardar tarifas"}
+          {state.kind === "saving" ? "Guardando..." : "Guardar"}
         </Button>
         <StatusText state={state} />
       </div>
-    </Card>
+    </div>
   );
 }

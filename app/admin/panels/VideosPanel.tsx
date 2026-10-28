@@ -2,7 +2,7 @@
 
 import { useContext, useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2, Upload } from "lucide-react";
-import { AuthLostContext, Button, Card, Field, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
+import { AuthLostContext, Button, Field, PanelHeader, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
 
 type Row = { key: number; title: string; url: string };
 let nextKey = 1;
@@ -87,12 +87,11 @@ export default function VideosPanel() {
     setRows((r) => r.map((row, idx) => (idx === i ? { ...row, ...patch } : row)));
 
   return (
-    <Card>
-      <h2 className="font-display text-2xl text-text-primary mb-1">Videos</h2>
-      <p className="text-text-secondary text-sm mb-5">
-        Sube un video (hasta 100 MB) o pega un enlace de YouTube (se reproduce en el sitio), TikTok o Instagram (abre en
-        su app). Sin videos, la sección no se muestra.
-      </p>
+    <div>
+      <PanelHeader
+        title="Videos"
+        description="Sube un video (hasta 100 MB) o pega un enlace de YouTube, TikTok o Instagram. Sin videos, la sección no se muestra."
+      />
 
       <div className="space-y-4">
         {rows.map((row, i) => (
@@ -164,6 +163,6 @@ export default function VideosPanel() {
         </Button>
         <StatusText state={state} />
       </div>
-    </Card>
+    </div>
   );
 }

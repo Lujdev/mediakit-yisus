@@ -3,18 +3,21 @@
 import { useCallback, useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import type { Brand } from "@/lib/site-data";
-import { Button, Card, Field, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
+import { Button, Disclosure, Field, PanelHeader, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
+
+const FILE_INPUT =
+  "block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:text-text-primary";
 
 function LogoThumb({ src, name }: { src: string | null; name: string }) {
   return (
-    <div className="flex h-16 w-28 shrink-0 items-center justify-center rounded-lg bg-white/10 p-2">
+    <span className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-white/10 p-1.5">
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={name} className="max-h-full max-w-full object-contain" />
       ) : (
-        <span className="text-center text-[11px] text-text-secondary">Sin logo</span>
+        <span className="text-[10px] text-text-secondary">sin logo</span>
       )}
-    </div>
+    </span>
   );
 }
 
@@ -56,10 +59,16 @@ function BrandRow({
   };
 
   return (
-    <div className="rounded-xl border border-white/10 p-3 md:p-4 space-y-3">
-      <div className="flex gap-3">
-        <LogoThumb src={brand.logo} name={brand.name} />
-        <div className="grid flex-1 grid-cols-1 md:grid-cols-2 gap-3">
+    <Disclosure
+      summary={
+        <span className="flex items-center gap-4">
+          <LogoThumb src={brand.logo} name={brand.name} />
+          <span className="truncate font-medium text-text-primary">{brand.name}</span>
+        </span>
+      }
+    >
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="Nombre">
             <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
           </Field>
@@ -67,40 +76,38 @@ function BrandRow({
             <input type="url" value={url} placeholder="https://" onChange={(e) => setUrl(e.target.value)} className={inputClass} />
           </Field>
         </div>
+        <div className="flex flex-wrap items-center gap-4">
+          <Field label={brand.logo ? "Reemplazar logo" : "Subir logo"}>
+            <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className={FILE_INPUT} />
+          </Field>
+          {brand.logo && (
+            <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-text-secondary">
+              <input type="checkbox" checked={removeLogo} onChange={(e) => setRemoveLogo(e.target.checked)} className="h-5 w-5 accent-[#D4F23A]" />
+              Quitar logo
+            </label>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button disabled={state.kind === "saving"} onClick={save}>Guardar</Button>
+          <Button variant="ghost" aria-label="Subir en la lista" disabled={index === 0} onClick={() => onMove(index - 1)}>
+            <ArrowUp size={16} aria-hidden />
+          </Button>
+          <Button variant="ghost" aria-label="Bajar en la lista" disabled={index === count - 1} onClick={() => onMove(index + 1)}>
+            <ArrowDown size={16} aria-hidden />
+          </Button>
+          <Button variant="danger" onClick={remove}>
+            <Trash2 size={16} aria-hidden /> Eliminar
+          </Button>
+          <StatusText state={state} />
+        </div>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <Field label={brand.logo ? "Reemplazar logo" : "Subir logo"}>
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:text-text-primary"
-          />
-        </Field>
-        {brand.logo && (
-          <label className="flex min-h-11 items-center gap-2 text-sm text-text-secondary cursor-pointer">
-            <input type="checkbox" checked={removeLogo} onChange={(e) => setRemoveLogo(e.target.checked)} className="h-5 w-5 accent-[#D4F23A]" />
-            Quitar logo
-          </label>
-        )}
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <Button variant="ghost" aria-label="Subir" disabled={index === 0} onClick={() => onMove(index - 1)}>
-          <ArrowUp size={16} aria-hidden />
-        </Button>
-        <Button variant="ghost" aria-label="Bajar" disabled={index === count - 1} onClick={() => onMove(index + 1)}>
-          <ArrowDown size={16} aria-hidden />
-        </Button>
-        <Button disabled={state.kind === "saving"} onClick={save}>Guardar</Button>
-        <Button variant="danger" onClick={remove}><Trash2 size={16} aria-hidden /> Eliminar</Button>
-        <StatusText state={state} />
-      </div>
-    </div>
+    </Disclosure>
   );
 }
 
 export default function BrandsPanel() {
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState("");
   const [newUrl, setNewUrl] = useState("");
   const [newFile, setNewFile] = useState<File | null>(null);
@@ -125,6 +132,7 @@ export default function BrandsPanel() {
       setNewUrl("");
       setNewFile(null);
       setFileKey((k) => k + 1);
+      setAdding(false);
       load();
     }
   };
@@ -136,53 +144,42 @@ export default function BrandsPanel() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <h2 className="font-display text-2xl text-text-primary mb-1">Agregar marca</h2>
-        <p className="text-text-secondary text-sm mb-4">
-          Sube el logo en PNG, JPG o WebP (máx. 4 MB). Si tiene fondo blanco, se elimina automáticamente.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Field label="Nombre">
-            <input value={newName} onChange={(e) => setNewName(e.target.value)} className={inputClass} />
-          </Field>
-          <Field label="Enlace (opcional)">
-            <input type="url" value={newUrl} placeholder="https://" onChange={(e) => setNewUrl(e.target.value)} className={inputClass} />
-          </Field>
-        </div>
-        <div className="mt-3 flex flex-wrap items-end gap-3">
-          <Field label="Logo">
-            <input
-              key={fileKey}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
-              className="block text-sm text-text-secondary file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:text-text-primary"
-            />
-          </Field>
-          <Button disabled={!newName.trim() || state.kind === "saving"} onClick={add}>
-            <Plus size={16} aria-hidden /> Agregar
-          </Button>
-          <StatusText state={state} />
-        </div>
-      </Card>
+    <div>
+      <PanelHeader title="Marcas" description="Sube el logo en PNG, JPG o WebP. Si tiene fondo blanco, se elimina solo." />
 
-      <Card>
-        <h2 className="font-display text-2xl text-text-primary mb-4">Marcas ({brands.length})</h2>
-        <div className="space-y-4">
-          {brands.map((b, i) => (
-            <BrandRow
-              key={`${b.id}-${b.logo}`}
-              brand={b}
-              index={i}
-              count={brands.length}
-              onMove={(to) => reorder(i, to)}
-              onChanged={load}
-            />
-          ))}
-          {brands.length === 0 && <p className="text-text-secondary text-sm">No hay marcas todavía.</p>}
-        </div>
-      </Card>
+      <div className="mb-6">
+        {adding ? (
+          <div className="space-y-4 rounded-xl border border-accent-lime/40 p-4 md:p-5">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <Field label="Nombre">
+                <input autoFocus value={newName} onChange={(e) => setNewName(e.target.value)} className={inputClass} />
+              </Field>
+              <Field label="Enlace (opcional)">
+                <input type="url" value={newUrl} placeholder="https://" onChange={(e) => setNewUrl(e.target.value)} className={inputClass} />
+              </Field>
+            </div>
+            <Field label="Logo">
+              <input key={fileKey} type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setNewFile(e.target.files?.[0] ?? null)} className={FILE_INPUT} />
+            </Field>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button disabled={!newName.trim() || state.kind === "saving"} onClick={add}>Agregar</Button>
+              <Button variant="ghost" onClick={() => setAdding(false)}>Cancelar</Button>
+              <StatusText state={state} />
+            </div>
+          </div>
+        ) : (
+          <Button variant="ghost" onClick={() => setAdding(true)}>
+            <Plus size={16} aria-hidden /> Agregar marca
+          </Button>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-white/10 px-3 md:px-5">
+        {brands.map((b, i) => (
+          <BrandRow key={`${b.id}-${b.logo}`} brand={b} index={i} count={brands.length} onMove={(to) => reorder(i, to)} onChanged={load} />
+        ))}
+        {brands.length === 0 && <p className="py-6 text-sm text-text-secondary">No hay marcas todavía.</p>}
+      </div>
     </div>
   );
 }
