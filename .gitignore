@@ -43,3 +43,7 @@ next-env.d.ts
 # local development database
 local.db
 local.db-*
+
+# local tooling and agents
+.atl/
+.commandcode/
