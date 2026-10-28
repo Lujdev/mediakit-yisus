@@ -48,8 +48,8 @@ MediaKit web interactivo y de alto impacto visual para **Yisus Contreras** (@yis
 ## Scripts
 
 ```bash
-pnpm dev      # Desarrollo local
-pnpm build    # Build de producción
+bun dev      # Desarrollo local
+bun run build    # Build de producción
 ```
 
 ## Estructura
