@@ -78,7 +78,6 @@ export default function Contact() {
                 className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
               />
             </a>
-            <p className="mt-3 text-sm text-text-secondary">{settings.whatsapp_label}</p>
 
             <ul className="mt-10 border-b border-white/10">
               {channels.map(({ name, label: text, href, Icon }) => (
