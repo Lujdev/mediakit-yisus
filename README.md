@@ -42,8 +42,12 @@ MediaKit web interactivo y de alto impacto visual para **Yisus Contreras** (@yis
 ## Admin Panel
 
 - URL: `/admin`
-- Password: `yisus2026`
-- Funcionalidades: editar métricas de Instagram y TikTok
+- Auth: contraseña definida en la variable de entorno `ADMIN_PASSWORD` (sesión en cookie httpOnly firmada, 7 días). En producción, sin esa variable el login queda bloqueado. En local, sin variable, se usa una contraseña de desarrollo.
+- Opcional: `ADMIN_SESSION_SECRET` para firmar la sesión con un secreto distinto.
+- Pestañas: Métricas, Marcas (logos), Tarifas (ES/EN), Redes, Videos, Contactos.
+- Logos: al subir una imagen con fondo blanco, el fondo se elimina automáticamente (`lib/logo.ts`). El sitio los muestra en blanco.
+- Videos: enlaces de YouTube (se reproducen en el sitio), TikTok/Instagram (abren en su app) o `.mp4` directo. Sin videos, la sección no aparece.
+- Contenido editable (marcas, tarifas, redes, videos) vive en la base de datos (Turso en producción) y se siembra con valores por defecto la primera vez.
 
 ## Scripts
 
