@@ -12,31 +12,32 @@ import { useEffect, useState } from "react";
 import { useLang } from "../i18n/LanguageProvider";
 
 const ease = [0.76, 0, 0.24, 1] as const;
-const RING_R = 50;
-const RING_LEN = 2 * Math.PI * RING_R;
+
+const GLINT =
+  "linear-gradient(105deg, transparent 38%, rgba(255,255,255,0.95) 50%, transparent 62%)";
 
 /**
- * Intro screen: the YC monogram inside a progress ring. The logo tilts toward the pointer
- * (or a finger drag) and spins when clicked, tapped or activated with the keyboard.
+ * Intro: the YC monogram comes into focus like a photograph being developed (blur to sharp,
+ * dim to bright) while a glint of light sweeps across it. Tilts with the pointer, extra glint on tap.
  */
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const { t } = useLang();
   const reduceMotion = useReducedMotion();
   const [count, setCount] = useState(0);
   const [visible, setVisible] = useState(true);
+  const [burst, setBurst] = useState(0);
 
-  const tiltX = useSpring(useMotionValue(0), { stiffness: 140, damping: 14 });
-  const tiltY = useSpring(useMotionValue(0), { stiffness: 140, damping: 14 });
-  const spin = useMotionValue(0);
+  const tiltX = useSpring(useMotionValue(0), { stiffness: 120, damping: 16 });
+  const tiltY = useSpring(useMotionValue(0), { stiffness: 120, damping: 16 });
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const controls = animate(0, 100, {
-      duration: 2.6,
+      duration: 2.8,
       ease: [0.65, 0, 0.35, 1],
       onUpdate: (v) => setCount(Math.round(v)),
       onComplete: () => {
-        timer = setTimeout(() => setVisible(false), 350);
+        timer = setTimeout(() => setVisible(false), 450);
       },
     });
     document.body.style.overflow = "hidden";
@@ -47,93 +48,80 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     };
   }, []);
 
-  // Tilt toward the pointer anywhere on screen (mouse hover or touch drag).
+  // Subtle 3D tilt toward the pointer (mouse hover or touch drag).
   useEffect(() => {
     if (reduceMotion) return;
     const move = (e: PointerEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      tiltY.set(x * 22);
-      tiltX.set(-y * 22);
+      tiltY.set((e.clientX / window.innerWidth - 0.5) * 2 * 14);
+      tiltX.set(-(e.clientY / window.innerHeight - 0.5) * 2 * 14);
     };
     window.addEventListener("pointermove", move, { passive: true });
     return () => window.removeEventListener("pointermove", move);
   }, [reduceMotion, tiltX, tiltY]);
 
-  const spinLogo = () => {
-    if (reduceMotion) return;
-    animate(spin, spin.get() + 360, { duration: 0.9, ease: [0.22, 1, 0.36, 1] });
-  };
+  const progress = count / 100;
 
   return (
     <AnimatePresence onExitComplete={onComplete}>
       {visible && (
         <motion.div
           role="status"
+          data-theme="dark"
           aria-label={`${t.preloader} ${count}%`}
           className="fixed inset-0 z-[80] flex flex-col justify-between overflow-hidden bg-bg-primary p-5 md:p-10"
           exit={{ y: "-100%" }}
           transition={{ duration: 0.9, ease }}
         >
-          <div className="flex items-start justify-between font-mono text-[11px] tracking-[0.25em] uppercase text-text-secondary">
+          <div className="flex items-start justify-between font-serif text-lg italic text-text-secondary md:text-2xl">
             <span>Yisus Contreras</span>
-            <span>MediaKit</span>
+            <span>Media Kit · 2026</span>
           </div>
 
-          <div className="flex justify-center">
-            <div className="relative aspect-square w-[78vw] max-w-[440px]" style={{ perspective: 800 }}>
-              {/* Progress ring + rotating "loading attitude" text */}
-              <svg viewBox="0 0 120 120" className="absolute inset-0 h-full w-full" aria-hidden>
-                <defs>
-                  <path id="preloader-text-circle" d="M60,60 m-56,0 a56,56 0 1,1 112,0 a56,56 0 1,1 -112,0" />
-                </defs>
-                <g className="origin-center animate-[spin_16s_linear_infinite] motion-reduce:animate-none">
-                  <text fill="currentColor" fontSize="6.5" letterSpacing="2" className="font-mono uppercase text-text-secondary">
-                    <textPath href="#preloader-text-circle" textLength="350" lengthAdjust="spacing">
-                      {`${t.preloader} · ${t.preloader} · ${t.preloader} · `}
-                    </textPath>
-                  </text>
-                </g>
-                <circle cx="60" cy="60" r={RING_R} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                <circle
-                  cx="60"
-                  cy="60"
-                  r={RING_R}
-                  fill="none"
-                  stroke="#D4F23A"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeDasharray={RING_LEN}
-                  strokeDashoffset={RING_LEN * (1 - count / 100)}
-                  transform="rotate(-90 60 60)"
+          <div className="flex justify-center" style={{ perspective: 900 }}>
+            <motion.button
+              type="button"
+              onClick={() => setBurst((b) => b + 1)}
+              aria-label={t.preloaderSpin}
+              style={{ rotateX: tiltX, rotateY: tiltY }}
+              className="relative aspect-[458/480] w-[64vw] max-w-[400px] cursor-pointer"
+            >
+              {/* Focus pull: sharpness and brightness follow progress. */}
+              <span
+                aria-hidden
+                className="logo-mark absolute inset-0"
+                style={{
+                  filter: `blur(${((1 - progress) * 16).toFixed(1)}px)`,
+                  opacity: 0.25 + progress * 0.75,
+                  transform: `scale(${0.94 + progress * 0.06})`,
+                }}
+              />
+              {/* Continuous glint, plus a faster one each time it is tapped. */}
+              <span
+                aria-hidden
+                className="logo-mark glint absolute inset-0 animate-[glint_2.4s_ease-in-out_infinite]"
+                style={{ backgroundColor: "transparent", backgroundImage: GLINT, backgroundSize: "260% 100%", backgroundRepeat: "no-repeat" }}
+              />
+              {burst > 0 && (
+                <span
+                  key={burst}
+                  aria-hidden
+                  className="logo-mark glint absolute inset-0 animate-[glint_0.9s_ease-out_1]"
+                  style={{ backgroundColor: "transparent", backgroundImage: GLINT, backgroundSize: "260% 100%", backgroundRepeat: "no-repeat" }}
                 />
-              </svg>
-
-              <motion.button
-                type="button"
-                onClick={spinLogo}
-                aria-label={t.preloaderSpin}
-                style={{ rotateX: tiltX, rotateY: tiltY, rotateZ: spin }}
-                whileTap={{ scale: 0.92 }}
-                className="absolute inset-[22%] flex cursor-pointer items-center justify-center"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-yc.png" alt="" width={458} height={480} draggable={false} className="h-full w-full select-none object-contain" />
-              </motion.button>
-            </div>
+              )}
+            </motion.button>
           </div>
 
           <div className="flex items-end justify-between gap-4">
-            <p className="font-display text-[26vw] leading-[0.8] tabular-nums text-text-primary md:text-[10rem]">
+            <p className="font-serif text-[28vw] italic leading-[0.8] tabular-nums text-text-primary md:text-[11rem]">
               {count}
-              <span className="text-accent-lime text-[0.4em]">%</span>
+              <span className="align-top text-[0.28em] not-italic text-accent-ink">%</span>
             </p>
-            <p className="max-w-[9rem] pb-2 text-right font-mono text-[11px] tracking-[0.25em] uppercase text-text-secondary">
-              {t.preloaderHint}
-            </p>
+            <p className="pb-2 text-right font-serif text-xl italic text-text-secondary md:text-3xl">{t.preloader}…</p>
           </div>
 
-          <span aria-hidden className="absolute bottom-0 left-0 h-1 bg-accent-lime" style={{ width: `${count}%` }} />
+          <span aria-hidden className="absolute inset-x-0 bottom-0 h-px bg-line/15" />
+          <span aria-hidden className="absolute bottom-0 left-0 h-px bg-accent-ink" style={{ width: `${count}%` }} />
         </motion.div>
       )}
     </AnimatePresence>
