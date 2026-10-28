@@ -31,6 +31,13 @@ function classify(raw: string): Kind {
   }
 }
 
+/** Cloudinary delivery URLs get a first-frame poster so the card is not black before playback. */
+function posterFor(url: string) {
+  return url.includes("res.cloudinary.com") && url.includes("/f_mp4,q_auto/")
+    ? url.replace("/f_mp4,q_auto/", "/so_0,q_auto/").replace(/\.mp4$/, ".jpg")
+    : undefined;
+}
+
 function YouTubeLite({ id, title }: { id: string; title: string }) {
   const { t } = useLang();
   const [playing, setPlaying] = useState(false);
@@ -81,6 +88,7 @@ function VideoCard({ video }: { video: Video }) {
             controls
             playsInline
             preload="metadata"
+            poster={posterFor(video.url)}
             className="absolute inset-0 h-full w-full bg-black object-contain"
           />
         )}
