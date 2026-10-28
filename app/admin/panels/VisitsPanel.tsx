@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AuthLostContext, Button, PanelHeader, json } from "../ui";
 
 type Row = { k: string; c: number };
@@ -19,6 +19,7 @@ type Recent = {
 type Stats = {
   days: number;
   today: string;
+  lastId: number;
   totals: { visits: number; visitors: number };
   daily: { d: string; c: number }[];
   device: Row[];
@@ -89,23 +90,80 @@ export default function VisitsPanel() {
     if (res.ok) setIgnored(next);
   };
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch(`/api/admin/visits?days=${days}`, { cache: "no-store" })
-      .then(async (r) => {
+  // Live updates: poll every few seconds while the tab is visible and "live" is on.
+  const [live, setLive] = useState(true);
+  const [updatedAt, setUpdatedAt] = useState<number | null>(null);
+  const [now, setNow] = useState(0);
+  const [fresh, setFresh] = useState<Set<string>>(new Set());
+  const seen = useRef<Set<string> | null>(null);
+  const lastId = useRef(0);
+
+  const load = useCallback(
+    async (purge: boolean) => {
+      try {
+        const r = await fetch(`/api/admin/visits?days=${days}${purge ? "" : "&purge=0"}`, { cache: "no-store" });
         if (r.status === 401) return authLost();
         if (!r.ok) throw new Error();
-        const data = await r.json();
-        if (!cancelled) {
-          setStats(data);
-          setError("");
+        const data: Stats = await r.json();
+        // Highlight visits that were not in the previous snapshot (not on the very first load).
+        const keys = data.recent.map((v) => `${v.at}|${v.ip}`);
+        if (seen.current) {
+          const added = keys.filter((k) => !seen.current!.has(k));
+          if (added.length) {
+            setFresh(new Set(added));
+            setTimeout(() => setFresh(new Set()), 4000);
+          }
         }
-      })
-      .catch(() => !cancelled && setError("No se pudieron cargar las visitas."));
-    return () => {
-      cancelled = true;
+        seen.current = new Set(keys);
+        lastId.current = data.lastId;
+        setStats(data);
+        setError("");
+        setUpdatedAt(Date.now());
+        setNow(Date.now());
+      } catch {
+        setError("No se pudieron cargar las visitas.");
+      }
+    },
+    [days, authLost]
+  );
+
+  // Range change or first open: full load (includes the 90-day purge).
+  useEffect(() => {
+    seen.current = null;
+    load(true);
+  }, [load]);
+
+  // Every 10 s ask a very cheap question ("anything newer than the last visit I know?") and only
+  // reload the full stats when the answer is yes. Also stops by itself after 15 minutes so a forgotten
+  // tab does not keep polling forever.
+  useEffect(() => {
+    if (!live) return;
+    const check = async () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        const r = await fetch(`/api/admin/visits/live?after=${lastId.current}`, { cache: "no-store" });
+        if (r.status === 401) return authLost();
+        if (!r.ok) return;
+        const { count } = await r.json();
+        if (count > 0) await load(false);
+        else setUpdatedAt(Date.now());
+      } catch {}
     };
-  }, [days, authLost]);
+    const id = setInterval(check, 10_000);
+    const stop = setTimeout(() => setLive(false), 15 * 60_000);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      clearInterval(id);
+      clearTimeout(stop);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [live, load, authLost]);
+
+  // Ticks once a second so "updated X seconds ago" stays honest.
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   // One bar per day, zero-filled so quiet days show as gaps.
   const bars = useMemo(() => {
@@ -139,6 +197,18 @@ export default function VisitsPanel() {
             {ignored ? "Volver a contarlo" : "No contar este dispositivo"}
           </Button>
         )}
+      </div>
+
+      <div className="mb-3 flex flex-wrap items-center gap-3 text-sm">
+        <span className="flex items-center gap-2 text-text-secondary" role="status" aria-live="off">
+          <span className="relative flex h-2.5 w-2.5">
+            {live && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-ink opacity-60" />}
+            <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${live ? "bg-accent-ink" : "bg-text-secondary/50"}`} />
+          </span>
+          {live ? "En vivo" : "En pausa"}
+          {updatedAt && now >= updatedAt && <span className="text-text-secondary/70">· actualizado hace {Math.max(0, Math.round((now - updatedAt) / 1000))} s</span>}
+        </span>
+        <Button variant="ghost" onClick={() => setLive(!live)}>{live ? "Pausar" : "Reanudar"}</Button>
       </div>
 
       <div role="group" aria-label="Rango de días" className="mb-8 flex gap-2">
@@ -206,7 +276,7 @@ export default function VisitsPanel() {
             ) : (
               <ul className="rounded-xl border border-line/10 px-4 md:px-5">
                 {stats.recent.map((r, i) => (
-                  <li key={i} className="border-t border-line/10 py-3 text-sm first:border-t-0">
+                  <li key={`${r.at}|${r.ip}|${i}`} className={`border-t border-line/10 py-3 text-sm transition-colors duration-1000 first:border-t-0 ${fresh.has(`${r.at}|${r.ip}`) ? "bg-accent-ink/15" : ""}`}>
                     <div className="flex flex-wrap items-baseline justify-between gap-x-4">
                       <span className="font-mono text-text-primary">{r.ip ?? "IP desconocida"}</span>
                       <span className="font-mono text-[11px] text-text-secondary">{new Date(r.at).toLocaleString()}</span>

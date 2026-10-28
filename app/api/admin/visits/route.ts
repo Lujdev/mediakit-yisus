@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const requested = Number(req.nextUrl.searchParams.get("days"));
   const days = [7, 30, 90].includes(requested) ? requested : 30;
   try {
-    return NextResponse.json(await getVisitStats(days), { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json(await getVisitStats(days, req.nextUrl.searchParams.get("purge") !== "0"), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("GET visits error:", error);
     return NextResponse.json({ error: "Error al obtener visitas" }, { status: 500 });

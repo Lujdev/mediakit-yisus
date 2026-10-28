@@ -56,9 +56,10 @@ export async function recordVisit(req: NextRequest, body: { path?: unknown; refe
 
 type Row = { k: string; c: number };
 
-export async function getVisitStats(days: number) {
+export async function getVisitStats(days: number, purge = true) {
   await initDb();
-  await purgeVisits();
+  // Polls skip the purge: it only needs to run when the tab opens, not every few seconds.
+  if (purge) await purgeVisits();
   const since = `-${days} days`;
 
   const group = async (col: "device" | "os" | "browser" | "country" | "lang" | "referrer" | "path"): Promise<Row[]> => {
@@ -70,12 +71,13 @@ export async function getVisitStats(days: number) {
     return res.rows.map((r) => ({ k: String(r.k), c: Number(r.c) }));
   };
 
-  const [totals, daily, recent, device, os, browser, country, lang, referrer, path] = await Promise.all([
+  const [totals, lastRow, daily, recent, device, os, browser, country, lang, referrer, path] = await Promise.all([
     db.execute({
       sql: `SELECT COUNT(*) AS visits, COUNT(DISTINCT COALESCE(ip, '') || '|' || os || '|' || browser) AS visitors
             FROM visits WHERE created_at >= datetime('now', ?)`,
       args: [since],
     }),
+    db.execute("SELECT COALESCE(MAX(id), 0) AS last FROM visits"),
     db.execute({
       sql: `SELECT date(created_at) AS d, COUNT(*) AS c FROM visits
             WHERE created_at >= datetime('now', ?) GROUP BY d ORDER BY d`,
@@ -98,6 +100,7 @@ export async function getVisitStats(days: number) {
     days,
     // Server date (UTC) so the client can lay out the day bars without reading the clock while rendering.
     today: new Date().toISOString().slice(0, 10),
+    lastId: Number(lastRow.rows[0].last),
     totals: { visits: Number(totals.rows[0].visits), visitors: Number(totals.rows[0].visitors) },
     daily: daily.rows.map((r) => ({ d: String(r.d), c: Number(r.c) })),
     device,
@@ -121,4 +124,17 @@ export async function getVisitStats(days: number) {
       at: `${String(r.created_at).replace(" ", "T")}Z`,
     })),
   };
+}
+
+/**
+ * Cheap live check: only touches rows newer than `afterId` (primary-key range), so an idle site reads
+ * zero rows. The dashboard reloads the full stats only when this reports something new.
+ */
+export async function newVisitsSince(afterId: number) {
+  await initDb();
+  const res = await db.execute({
+    sql: "SELECT COUNT(*) AS c, COALESCE(MAX(id), ?) AS last FROM visits WHERE id > ?",
+    args: [afterId, afterId],
+  });
+  return { count: Number(res.rows[0].c), lastId: Number(res.rows[0].last) };
 }
