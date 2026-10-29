@@ -9,11 +9,17 @@ let db: Client;
 const url = process.env.TURSO_DATABASE_URL;
 const authToken = process.env.TURSO_AUTH_TOKEN;
 
+const isBuild = process.env.NEXT_PHASE === "phase-production-build";
+
 if (url && authToken) {
   // Production: Turso cloud
   db = createClient({ url, authToken });
+} else if (!isBuild && process.env.NODE_ENV === "production") {
+  // Never fall back to a local file in production: a serverless deploy would start from an
+  // empty SQLite file, seed the defaults and look like the admin's data was lost.
+  throw new Error("Faltan TURSO_DATABASE_URL y TURSO_AUTH_TOKEN en producción.");
 } else {
-  // Development: local SQLite file
+  // Development (and build-time module evaluation): local SQLite file
   db = createClient({ url: "file:./local.db" });
 }
 
