@@ -9,7 +9,9 @@
 
 const CRAWLER_UA =
   "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)";
-const TIMEOUT_MS = 9000;
+const BROWSER_UA =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+const TIMEOUT_MS = 6500;
 const PREVIEW_TTL_MS = 6 * 60 * 60 * 1000;
 const IMAGE_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -28,7 +30,7 @@ export type VideoPreview = { platform: string; image: string };
 
 type ImageEntry = { data: Buffer; type: string; at: number };
 
-const previewCache = new Map<string, { value: VideoPreview | null; at: number }>();
+const previewCache = new Map<string, { value: VideoPreview; at: number }>();
 const imageCache = new Map<string, ImageEntry>();
 
 function hostMatches(hostname: string, domains: string[]) {
@@ -52,26 +54,33 @@ function decodeEntities(value: string) {
     .replace(/&amp;/g, "&");
 }
 
-function remember(key: string, value: VideoPreview | null) {
-  if (previewCache.size > 200) previewCache.clear();
-  previewCache.set(key, { value, at: Date.now() });
-  return value;
-}
-
-async function getPage(url: string) {
+async function getPage(url: string, ua: string) {
   return fetch(url, {
     redirect: "follow",
-    headers: { "user-agent": CRAWLER_UA, accept: "text/html,application/xhtml+xml" },
+    headers: { "user-agent": ua, accept: "text/html,application/xhtml+xml" },
     signal: AbortSignal.timeout(TIMEOUT_MS),
     cache: "no-store",
   });
 }
 
+/** Some platforms answer crawlers with a challenge page, so try a browser UA as a fallback. */
+async function getHtml(url: string): Promise<{ html: string; url: string }> {
+  let lastError: unknown = null;
+  for (const ua of [CRAWLER_UA, BROWSER_UA]) {
+    try {
+      const res = await getPage(url, ua);
+      const html = await res.text();
+      if (res.ok && html.length > 500) return { html, url: res.url };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("No response");
+}
+
 async function instagramCover(url: URL): Promise<string | null> {
-  const res = await getPage(url.toString());
-  const finalUrl = new URL(res.url);
-  if (!hostMatches(finalUrl.hostname, ["instagram.com"])) return null;
-  const html = await res.text();
+  const { html, url: finalUrl } = await getHtml(url.toString());
+  if (!hostMatches(new URL(finalUrl).hostname, ["instagram.com"])) return null;
   const match =
     html.match(/<meta property="og:image" content="([^"]+)"/) ??
     html.match(/<meta property="og:image" content='([^']+)'/);
@@ -85,17 +94,18 @@ async function tiktokCover(url: URL): Promise<string | null> {
   let id = url.pathname.match(/\/video\/(\d+)/)?.[1];
   if (!id) {
     // vt.tiktok.com / vm.tiktok.com short links only reveal the id after the redirect.
-    const res = await getPage(url.toString());
-    const finalUrl = new URL(res.url);
-    if (!hostMatches(finalUrl.hostname, ["tiktok.com"])) return null;
-    id = finalUrl.pathname.match(/\/video\/(\d+)/)?.[1];
+    const { url: finalUrl } = await getHtml(url.toString());
+    const parsed = new URL(finalUrl);
+    if (!hostMatches(parsed.hostname, ["tiktok.com"])) return null;
+    id = parsed.pathname.match(/\/video\/(\d+)/)?.[1];
   }
   if (!id) return null;
 
-  const embed = await getPage(`https://www.tiktok.com/embed/${id}`);
-  const html = await embed.text();
+  const { html } = await getHtml(`https://www.tiktok.com/embed/${id}`);
   const match =
-    html.match(/"coversOrigin":\["([^"]+)"/) ?? html.match(/"covers":\["([^"]+)"/);
+    html.match(/"coversOrigin":\["([^"]+)"/) ??
+    html.match(/"covers":\["([^"]+)"/) ??
+    html.match(/"coversDynamic":\["([^"]+)"/);
   if (!match) return null;
   const cover = decodeEntities(match[1]);
   const parsed = parseHttpUrl(cover);
@@ -132,9 +142,30 @@ export async function resolveVideoPreview(raw: unknown): Promise<VideoPreview | 
       platform = url.hostname === "youtu.be" || url.hostname.endsWith("youtube.com") ? "YouTube" : "";
       image = youtubeCover(url);
     }
-    return remember(key, image ? { platform, image } : null);
+    if (!image) return null;
+    if (previewCache.size > 200) previewCache.clear();
+    const value = { platform, image };
+    previewCache.set(key, { value, at: Date.now() });
+    return value;
   } catch {
     // Network hiccups are not cached: the next request gets a fresh try.
+    return null;
+  }
+}
+
+async function downloadImage(image: string): Promise<ImageEntry | null> {
+  try {
+    const res = await fetch(image, {
+      headers: { "user-agent": CRAWLER_UA, accept: "image/*" },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      cache: "no-store",
+    });
+    const type = res.headers.get("content-type") ?? "";
+    if (!res.ok || !type.startsWith("image/")) return null;
+    const data = Buffer.from(await res.arrayBuffer());
+    if (!data.length || data.length > MAX_IMAGE_BYTES) return null;
+    return { data, type, at: Date.now() };
+  } catch {
     return null;
   }
 }
@@ -148,24 +179,17 @@ export async function fetchPreviewImage(raw: unknown): Promise<{ data: Buffer; t
   const cached = imageCache.get(key);
   if (cached && Date.now() - cached.at < IMAGE_TTL_MS) return cached;
 
-  const preview = await resolveVideoPreview(url.toString());
-  if (!preview) return null;
-
-  try {
-    const res = await fetch(preview.image, {
-      headers: { "user-agent": CRAWLER_UA, accept: "image/*" },
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-      cache: "no-store",
-    });
-    const type = res.headers.get("content-type") ?? "";
-    if (!res.ok || !type.startsWith("image/")) return null;
-    const data = Buffer.from(await res.arrayBuffer());
-    if (!data.length || data.length > MAX_IMAGE_BYTES) return null;
-    const entry = { data, type, at: Date.now() };
-    if (imageCache.size > 60) imageCache.clear();
-    imageCache.set(key, entry);
-    return entry;
-  } catch {
-    return null;
+  let preview = await resolveVideoPreview(key);
+  let image = preview ? await downloadImage(preview.image) : null;
+  if (!image && preview) {
+    // The signed CDN URL may have expired: drop the cache and resolve once more.
+    previewCache.delete(key);
+    preview = await resolveVideoPreview(key);
+    image = preview ? await downloadImage(preview.image) : null;
   }
+  if (!image) return null;
+
+  if (imageCache.size > 60) imageCache.clear();
+  imageCache.set(key, image);
+  return image;
 }
