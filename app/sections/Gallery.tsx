@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GALLERY_IMAGES, type GalleryCategory, type GalleryImage } from "../data/gallery";
 import { useSiteData } from "../data/SiteData";
+import { useChromaSpotlight } from "../hooks/useChromaSpotlight";
 import { useLang } from "../i18n/LanguageProvider";
 import Lightbox from "../components/Lightbox";
 import Reveal from "../components/Reveal";
@@ -31,6 +32,8 @@ export default function Gallery() {
   );
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState<number | null>(null);
+  // One blob of colour follows the pointer across the whole grid (see useChromaSpotlight).
+  const chromaRef = useChromaSpotlight<HTMLDivElement>();
   const cursorRef = useRef<HTMLDivElement>(null);
 
   const categories = useMemo(
@@ -135,72 +138,86 @@ export default function Gallery() {
           </div>
         </Reveal>
 
-        {/* Mobile: snap carousel. Desktop: masonry that keeps each photo's own proportions. */}
-        <div className="relative">
-        <motion.ul
-          ref={trackRef}
-          onScroll={updateEdge}
-          key={filter}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
-          onPointerMove={moveCursor}
-          className="flex gap-3 overflow-x-auto snap-x snap-mandatory overscroll-x-contain -mx-4 px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:px-0 md:block md:columns-3 md:gap-4 md:overflow-visible md:pb-0"
-        >
-          {images.map((img, i) => (
-            <li
-              key={img.src}
-              className="shrink-0 w-[78%] snap-center md:w-auto md:mb-4 md:break-inside-avoid"
-            >
+        {/* Mobile: snap carousel. Desktop: a contact sheet whose colour follows the cursor. */}
+        <div ref={chromaRef} className="chroma relative">
+          <motion.ul
+            ref={trackRef}
+            onScroll={updateEdge}
+            key={filter}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            onPointerMove={moveCursor}
+            className="flex gap-3 overflow-x-auto snap-x snap-mandatory overscroll-x-contain -mx-4 px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0"
+          >
+            {images.map((img, i) => (
+              <li key={img.src} data-chroma-card className="shrink-0 w-[78%] snap-center md:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setOpen(i)}
+                  onPointerEnter={(e) => e.pointerType === "mouse" && showCursor(true)}
+                  onPointerLeave={() => showCursor(false)}
+                  aria-label={`${label(img.category)} ${pad(i + 1)}/${pad(images.length)} · ${t.gallery.viewLarge}: ${img.alt[lang]}`}
+                  className="chroma-card group relative block w-full overflow-hidden rounded-2xl bg-bg-secondary cursor-pointer md:cursor-none"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-bg-secondary">
+                    <Image
+                      src={img.src}
+                      alt={img.alt[lang]}
+                      width={1125}
+                      height={1500}
+                      sizes="(max-width: 768px) 78vw, 33vw"
+                      style={{ objectPosition: img.focal }}
+                      className="chroma-photo h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    />
+                    <Image
+                      src={img.src}
+                      alt=""
+                      aria-hidden
+                      width={1125}
+                      height={1500}
+                      sizes="(max-width: 768px) 78vw, 33vw"
+                      style={{ objectPosition: img.focal }}
+                      className="chroma-colour absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    />
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/15 transition-colors duration-300 group-hover:ring-accent-lime/70"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/85 via-black/25 to-transparent p-4 pt-24">
+                      <span className="font-display text-3xl leading-none tracking-wide text-white md:text-4xl">
+                        {label(img.category)}
+                      </span>
+                      <span className="font-mono text-[11px] tracking-widest text-accent-lime">
+                        {pad(i + 1)}/{pad(images.length)}
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              </li>
+            ))}
+          </motion.ul>
+          {(["prev", "next"] as const).map((side) => {
+            const hidden = side === "prev" ? edge.start : edge.end;
+            return (
               <button
+                key={side}
                 type="button"
-                onClick={() => setOpen(i)}
-                onPointerEnter={(e) => e.pointerType === "mouse" && showCursor(true)}
-                onPointerLeave={() => showCursor(false)}
-                aria-label={`${label(img.category)} ${pad(i + 1)}/${pad(images.length)} · ${t.gallery.viewLarge}: ${img.alt[lang]}`}
-                className="group relative block w-full overflow-hidden rounded-2xl cursor-pointer md:cursor-none"
+                aria-label={side === "prev" ? t.gallery.prev : t.gallery.next}
+                onClick={() => step(side === "prev" ? -1 : 1)}
+                tabIndex={hidden ? -1 : 0}
+                className={`absolute top-[calc(50%-1rem)] z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line/25 bg-bg-primary/80 text-text-primary backdrop-blur transition-opacity duration-200 md:hidden cursor-pointer ${
+                  side === "prev" ? "left-1" : "right-1"
+                } ${hidden ? "pointer-events-none opacity-0" : "opacity-100"}`}
               >
-                <div className="relative aspect-[4/5] md:aspect-auto">
-                  <Image
-                    src={img.src}
-                    alt={img.alt[lang]}
-                    width={1125}
-                    height={1500}
-                    sizes="(max-width: 768px) 78vw, 33vw"
-                    style={{ objectPosition: img.focal }}
-                    className="h-full w-full object-cover md:h-auto grayscale-[35%] transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
-                  />
-                </div>
-                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-20">
-                  <span className="font-display text-3xl leading-none tracking-wide text-text-primary md:text-4xl">
-                    {label(img.category)}{" "}
-                  </span>
-                  <span className="font-mono text-[11px] tracking-widest text-accent-ink">
-                    {pad(i + 1)}/{pad(images.length)}
-                  </span>
-                </div>
+                {side === "prev" ? <ChevronLeft size={22} aria-hidden /> : <ChevronRight size={22} aria-hidden />}
               </button>
-            </li>
-          ))}
-        </motion.ul>
-        {(["prev", "next"] as const).map((side) => {
-          const hidden = side === "prev" ? edge.start : edge.end;
-          return (
-            <button
-              key={side}
-              type="button"
-              aria-label={side === "prev" ? t.gallery.prev : t.gallery.next}
-              onClick={() => step(side === "prev" ? -1 : 1)}
-              tabIndex={hidden ? -1 : 0}
-              className={`absolute top-[calc(50%-1rem)] z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line/25 bg-bg-primary/80 text-text-primary backdrop-blur transition-opacity duration-200 md:hidden cursor-pointer ${
-                side === "prev" ? "left-1" : "right-1"
-              } ${hidden ? "pointer-events-none opacity-0" : "opacity-100"}`}
-            >
-              {side === "prev" ? <ChevronLeft size={22} aria-hidden /> : <ChevronRight size={22} aria-hidden />}
-            </button>
-          );
-        })}
+            );
+          })}
         </div>
+        <p className="mt-3 hidden text-center font-mono text-[11px] uppercase tracking-widest text-text-secondary md:block">
+          {t.gallery.chromaHint}
+        </p>
         <p className="mt-2 text-center text-xs text-text-secondary md:hidden" aria-hidden>
           {t.gallery.swipeHint}
         </p>

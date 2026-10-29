@@ -6,8 +6,9 @@ import { useSiteData } from "../data/SiteData";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Magnetic from "../components/Magnetic";
+import Threads from "../components/Threads";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -16,6 +17,15 @@ export default function Hero() {
   // Photo set from the admin; the bundled one until it loads or when none was uploaded.
   const heroSrc = useSiteData()?.media.hero ?? "/images/0.jpg";
   const ref = useRef<HTMLElement>(null);
+  // The WebGL threads are desktop-only and off for reduced-motion visitors: the hero stays light on phones.
+  const [threads, setThreads] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)");
+    const update = () => setThreads(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
   const imgScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.25]);
@@ -41,6 +51,29 @@ export default function Hero() {
         />
       </motion.div>
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-bg-primary/70 via-bg-primary/30 to-bg-primary" />
+
+      {/* React Bits Threads: fine lime filaments drifting over the photo, parting around the pointer. */}
+      {threads && (
+        <div aria-hidden className="hero-threads pointer-events-none absolute inset-0 z-[1] mix-blend-screen">
+          <Threads
+            color="#d4f23a"
+            accentColor="#f5f5f0"
+            lineCount={64}
+            thickness={0.55}
+            amplitude={1.7}
+            speed={0.45}
+            angle={18}
+            split={0.06}
+            fray={0.45}
+            taper={0.9}
+            brightness={1.5}
+            fade={0.35}
+            opacity={0.38}
+            parting={0.6}
+            enableMouseInteraction
+          />
+        </div>
+      )}
 
       {/* Content */}
       <motion.div

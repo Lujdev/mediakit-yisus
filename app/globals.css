@@ -93,6 +93,60 @@ body {
   100% { transform: translate(0, 0); }
 }
 
+/* ---------- Chroma spotlight (React Bits Chroma Grid) ---------- */
+
+/* The pointer paints a soft circle of colour over the desaturated gallery photos. */
+.chroma {
+  --chroma-x: -9999px;
+  --chroma-y: -9999px;
+  --chroma-power: 0;
+  --chroma-r: 280px;
+  --chroma-gray: 1;
+  --chroma-stops: rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 28%, rgba(0, 0, 0, 0.65) 55%,
+    rgba(0, 0, 0, 0.22) 76%, rgba(0, 0, 0, 0) 92%;
+}
+
+.chroma-photo {
+  filter: grayscale(var(--chroma-gray)) brightness(0.92);
+  transition: filter 0.4s ease;
+}
+
+.chroma-colour {
+  opacity: var(--chroma-power, 0);
+  -webkit-mask-image: radial-gradient(
+    circle var(--chroma-r)
+      at calc(var(--chroma-x) - var(--chroma-ox, 0px)) calc(var(--chroma-y) - var(--chroma-oy, 0px)),
+    var(--chroma-stops)
+  );
+  mask-image: radial-gradient(
+    circle var(--chroma-r)
+      at calc(var(--chroma-x) - var(--chroma-ox, 0px)) calc(var(--chroma-y) - var(--chroma-oy, 0px)),
+    var(--chroma-stops)
+  );
+}
+
+/* Keyboard users get the full photo, not a grey card. */
+.chroma-card:focus-visible .chroma-colour {
+  opacity: 1;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* Touch devices and reduced motion: plain colour photos, no chasing spotlight. */
+.chroma[data-chroma="off"] {
+  --chroma-gray: 0;
+}
+
+.chroma[data-chroma="off"] .chroma-photo {
+  filter: none;
+}
+
+/* Threads over the hero photo: keep the title area clean, texture the edges. */
+.hero-threads {
+  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 52%, transparent 20%, #000 78%);
+  mask-image: radial-gradient(ellipse 62% 58% at 50% 52%, transparent 20%, #000 78%);
+}
+
 /* Outlined display text */
 .text-outline {
   -webkit-text-stroke: 1px rgb(var(--text-primary) / 0.35);
