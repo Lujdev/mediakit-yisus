@@ -1,6 +1,7 @@
 "use client";
 
 import { Play, ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import type { Video } from "@/lib/site-data";
 import { useLang } from "../i18n/LanguageProvider";
@@ -74,8 +75,57 @@ function YouTubeLite({ id, title }: { id: string; title: string }) {
   );
 }
 
-function VideoCard({ video }: { video: Video }) {
+/** Social link card: the cover comes from /api/videos/preview, resolved server-side per link. */
+function LinkCard({ video, platform }: { video: Video; platform: string }) {
   const { t } = useLang();
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <a
+      href={video.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group absolute inset-0 flex flex-col items-center justify-center gap-3 overflow-hidden bg-gradient-to-br from-bg-secondary to-bg-primary cursor-pointer"
+    >
+      {!failed && (
+        <>
+          {/* Blurred fill for the 16:9 frame, then the full vertical cover on top. */}
+          <Image
+            src={`/api/videos/preview?url=${encodeURIComponent(video.url)}`}
+            alt=""
+            aria-hidden
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            unoptimized
+            className="scale-110 object-cover opacity-50 blur-lg"
+          />
+          <Image
+            src={`/api/videos/preview?url=${encodeURIComponent(video.url)}`}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            unoptimized
+            onError={() => setFailed(true)}
+            className="object-contain transition-transform duration-500 group-hover:scale-[1.03]"
+          />
+        </>
+      )}
+      <span
+        aria-hidden
+        className="absolute inset-0 bg-black/25 transition-colors duration-300 group-hover:bg-black/10"
+      />
+      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-accent-lime text-on-accent transition-transform group-hover:scale-110">
+        <Play size={22} fill="currentColor" aria-hidden />
+      </span>
+      <span className="relative inline-flex items-center gap-1 rounded-full bg-bg-primary/70 px-3 py-1 font-mono text-xs tracking-widest uppercase text-text-primary backdrop-blur transition-colors group-hover:text-accent-ink">
+        {t.videos.watchOn} {platform}
+        <ArrowUpRight size={14} aria-hidden />
+      </span>
+    </a>
+  );
+}
+
+function VideoCard({ video }: { video: Video }) {
   const kind = classify(video.url);
 
   return (
@@ -92,22 +142,7 @@ function VideoCard({ video }: { video: Video }) {
             className="absolute inset-0 h-full w-full bg-black object-contain"
           />
         )}
-        {kind.type === "link" && (
-          <a
-            href={video.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-bg-secondary to-bg-primary cursor-pointer"
-          >
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-lime text-on-accent transition-transform group-hover:scale-110">
-              <Play size={22} fill="currentColor" aria-hidden />
-            </span>
-            <span className="inline-flex items-center gap-1 font-mono text-xs tracking-widest uppercase text-text-secondary group-hover:text-accent-ink transition-colors">
-              {t.videos.watchOn} {kind.platform}
-              <ArrowUpRight size={14} aria-hidden />
-            </span>
-          </a>
-        )}
+        {kind.type === "link" && <LinkCard video={video} platform={kind.platform} />}
       </div>
       {video.title && <figcaption className="text-text-primary text-sm md:text-base">{video.title}</figcaption>}
     </figure>
