@@ -17,16 +17,11 @@ export default function SiteBackground() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const pointer = window.matchMedia("(any-hover: hover) and (any-pointer: fine)");
     const motion = window.matchMedia("(prefers-reduced-motion: no-preference)");
-    const update = () => setInteractive(pointer.matches && motion.matches);
+    const update = () => setInteractive(motion.matches);
     update();
-    pointer.addEventListener("change", update);
     motion.addEventListener("change", update);
-    return () => {
-      pointer.removeEventListener("change", update);
-      motion.removeEventListener("change", update);
-    };
+    return () => motion.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {

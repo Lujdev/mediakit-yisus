@@ -48,7 +48,7 @@ export default function Gallery() {
   const label = (c: GalleryCategory) => t.gallery.categories[c] ?? c;
 
   useEffect(() => {
-    const query = window.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)");
+    const query = window.matchMedia("(prefers-reduced-motion: no-preference)");
     const update = () => {
       if (!query.matches) {
         setWebgl(false);
@@ -136,7 +136,7 @@ export default function Gallery() {
 
         {useCarousel ? (
           <>
-            <div className="relative h-[520px] lg:h-[600px]">
+            <div className="relative h-[440px] sm:h-[500px] lg:h-[600px]">
               <FlexCarousel
                 key={filter}
                 items={carouselItems}
@@ -144,7 +144,7 @@ export default function Gallery() {
                 intro="rise"
                 fit="natural"
                 cardHeight={0.62}
-                gap={14}
+                gap={12}
                 radius={16}
                 squeeze={0.12}
                 bend={0.24}
@@ -152,13 +152,17 @@ export default function Gallery() {
                 captureWheel={false}
                 focusOnClick={false}
                 captions
+                imageWidth={828}
                 onSelect={(index) => setOpen(index)}
                 onError={() => setWebglFailed(true)}
                 ariaLabel={t.gallery.title.join(" ")}
                 ofLabel={t.gallery.of}
               />
             </div>
-            <p className="mt-2 text-center font-mono text-[11px] uppercase tracking-widest text-text-secondary">
+            <p className="mt-2 text-center font-mono text-[10px] uppercase tracking-widest text-text-secondary md:hidden">
+              {t.gallery.carouselTouchHint}
+            </p>
+            <p className="mt-2 hidden text-center font-mono text-[11px] uppercase tracking-widest text-text-secondary md:block">
               {t.gallery.carouselHint}
             </p>
           </>

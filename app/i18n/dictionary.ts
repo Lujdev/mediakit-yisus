@@ -26,6 +26,8 @@ const es = {
   },
   preloader: "Cargando actitud",
   band: ["Cargando actitud", "Moda", "Lifestyle", "Styling", "Yisus Contreras"],
+  bandLabel: "Actitud",
+  bandStamp: "Sin límites",
   preloaderSpin: "Girar el logo",
   hero: {
     badge: "Content Creator · Venezuela",
@@ -121,6 +123,7 @@ const es = {
     filtersLabel: "Filtrar fotos por categoría",
     swipeHint: "Desliza para ver más",
     carouselHint: "Arrastra, desliza o usa las flechas para explorar",
+    carouselTouchHint: "Desliza y toca la foto central para abrirla",
     chromaHint: "Mueve el cursor sobre las fotos",
     prev: "Foto anterior",
     next: "Foto siguiente",
@@ -214,6 +217,8 @@ const en: Dict = {
   },
   preloader: "Loading attitude",
   band: ["Loading attitude", "Fashion", "Lifestyle", "Styling", "Yisus Contreras"],
+  bandLabel: "Attitude",
+  bandStamp: "No limits",
   preloaderSpin: "Spin the logo",
   hero: {
     badge: "Content Creator · Venezuela",
@@ -309,6 +314,7 @@ const en: Dict = {
     filtersLabel: "Filter photos by category",
     swipeHint: "Swipe to see more",
     carouselHint: "Drag, swipe or use the arrow keys to explore",
+    carouselTouchHint: "Swipe and tap the centered photo to open it",
     chromaHint: "Move the cursor over the photos",
     prev: "Previous photo",
     next: "Next photo",

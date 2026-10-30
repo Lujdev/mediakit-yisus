@@ -73,7 +73,7 @@ export default function About() {
                 <li key={pillar.title} className="group relative border-t border-line/10 py-5 md:py-6">
                   <span
                     aria-hidden
-                    className="absolute left-0 top-0 h-px w-full origin-left scale-x-0 bg-accent-ink transition-transform duration-500 group-hover:scale-x-100"
+                    className="absolute left-0 top-0 h-px w-full origin-left scale-x-0 bg-accent-ink/45 transition-[transform,background-color] duration-500 group-hover:scale-x-100 group-hover:bg-accent-ink max-md:scale-x-100"
                   />
                   <Reveal
                     delay={i * 0.06}

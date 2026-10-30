@@ -22,19 +22,19 @@ export default function Marquee({ items, reverse = false, variant = "logo", seri
       aria-hidden={hidden || undefined}
     >
       {filled.map((item, i) => (
-        <li key={`${item.name}-${i}`} className="flex items-center gap-10 md:gap-16 shrink-0">
+        <li key={`${item.name}-${i}`} className="flex items-center gap-8 md:gap-16 shrink-0">
           {variant === "logo" && item.logo ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={item.logo}
               alt={hidden ? "" : item.name}
               loading="lazy"
-              className="h-10 md:h-14 w-auto max-w-[220px] md:max-w-[300px] object-contain opacity-80 hover:opacity-100 transition-opacity logo-silhouette"
+              className="h-8 md:h-14 w-auto max-w-[180px] md:max-w-[300px] object-contain opacity-80 hover:opacity-100 transition-opacity logo-silhouette"
             />
           ) : (
-            <span className={serif ? "font-serif text-5xl italic md:text-7xl" : "font-display text-5xl md:text-7xl tracking-wide"}>{item.name}</span>
+            <span className={serif ? "font-serif text-4xl italic md:text-7xl" : "font-display text-4xl md:text-7xl tracking-wide"}>{item.name}</span>
           )}
-          <span aria-hidden className="h-8 w-px bg-line/20 md:h-12" />
+          <span aria-hidden className="h-6 w-px bg-line/20 md:h-12" />
         </li>
       ))}
     </ul>

@@ -32,9 +32,9 @@ function HomeContent() {
         <Ambient />
         <Tracker />
         {loading && <Preloader onComplete={() => setLoading(false)} />}
-        <Navigation />
+        <Navigation ready={!loading} />
         <main>
-          <Hero />
+          <Hero introReady={!loading} />
           <AttitudeBand />
           <About />
           <Metrics />
@@ -46,7 +46,13 @@ function HomeContent() {
         </main>
         <footer className="border-t border-line/10 px-4 py-8">
           <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 md:flex-row">
-            <LogoMark label="Yisus Contreras" className="h-10" />
+            <a
+              href="https://yisuscontreras.com"
+              aria-label="Yisus Contreras — yisuscontreras.com"
+              className="inline-flex h-11 items-center cursor-pointer"
+            >
+              <LogoMark label="Yisus Contreras" className="h-10" />
+            </a>
             <p className="text-sm text-text-secondary">
               © {new Date().getFullYear()} Yisus Contreras. {t.footer.rights}
             </p>

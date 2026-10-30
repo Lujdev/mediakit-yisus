@@ -26,7 +26,7 @@ export default function Brands() {
       </div>
 
       <Reveal>
-        <div className="border-y border-line/10 py-8 md:py-10 space-y-6">
+        <div className="space-y-6 border-y border-line/10 py-8 md:py-10">
           <Marquee items={brands} className="text-text-primary" />
           <Marquee items={brands} reverse variant="outline" className="text-outline" />
         </div>
