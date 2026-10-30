@@ -141,12 +141,6 @@ body {
   filter: none;
 }
 
-/* Threads over the hero photo: keep the title area clean, texture the edges. */
-.hero-threads {
-  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 52%, transparent 20%, #000 78%);
-  mask-image: radial-gradient(ellipse 62% 58% at 50% 52%, transparent 20%, #000 78%);
-}
-
 /* Outlined display text */
 .text-outline {
   -webkit-text-stroke: 1px rgb(var(--text-primary) / 0.35);

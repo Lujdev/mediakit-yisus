@@ -14,6 +14,7 @@ import Contact from "./sections/Contact";
 import { SiteDataProvider } from "./data/SiteData";
 import { LanguageProvider, useLang } from "./i18n/LanguageProvider";
 import Ambient from "./components/Ambient";
+import SiteBackground from "./components/SiteBackground";
 import LogoMark from "./components/LogoMark";
 import AttitudeBand from "./components/AttitudeBand";
 import Tracker from "./components/Tracker";
@@ -26,43 +27,46 @@ function HomeContent() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <Ambient />
-      <Tracker />
-      {loading && <Preloader onComplete={() => setLoading(false)} />}
-      <Navigation />
-      <main>
-        <Hero />
-        <AttitudeBand />
-        <About />
-        <Metrics />
-        <Services />
-        <Brands />
-        <Gallery />
-        <Videos />
-        <Contact />
-      </main>
-      <footer className="border-t border-line/10 px-4 py-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 md:flex-row">
-          <LogoMark label="Yisus Contreras" className="h-10" />
-          <p className="text-sm text-text-secondary">
-            © {new Date().getFullYear()} Yisus Contreras. {t.footer.rights}
-          </p>
-          <div className="flex flex-col items-center gap-1 md:items-end">
-            <p className="text-sm text-text-secondary">{t.footer.madeWith}</p>
-            <a
-              href="https://www.instagram.com/luii.dev/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest text-text-secondary transition-colors hover:text-accent-ink"
-            >
-              {t.footer.credit}
-              <span aria-hidden className="transition-transform group-hover:-translate-y-0.5">
-                ↗
-              </span>
-            </a>
+      <div className="relative isolate">
+        <SiteBackground />
+        <Ambient />
+        <Tracker />
+        {loading && <Preloader onComplete={() => setLoading(false)} />}
+        <Navigation />
+        <main>
+          <Hero />
+          <AttitudeBand />
+          <About />
+          <Metrics />
+          <Services />
+          <Brands />
+          <Gallery />
+          <Videos />
+          <Contact />
+        </main>
+        <footer className="border-t border-line/10 px-4 py-8">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 md:flex-row">
+            <LogoMark label="Yisus Contreras" className="h-10" />
+            <p className="text-sm text-text-secondary">
+              © {new Date().getFullYear()} Yisus Contreras. {t.footer.rights}
+            </p>
+            <div className="flex flex-col items-center gap-1 md:items-end">
+              <p className="text-sm text-text-secondary">{t.footer.madeWith}</p>
+              <a
+                href="https://www.instagram.com/luii.dev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest text-text-secondary transition-colors hover:text-accent-ink"
+              >
+                {t.footer.credit}
+                <span aria-hidden className="transition-transform group-hover:-translate-y-0.5">
+                  ↗
+                </span>
+              </a>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </MotionConfig>
   );
 }
