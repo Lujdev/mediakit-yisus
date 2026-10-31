@@ -14,6 +14,26 @@ const text = (v: unknown, max = 300) => (typeof v === "string" ? v.trim().slice(
 const list = (v: unknown) =>
   Array.isArray(v) ? v.map((x) => text(x, 160)).filter(Boolean).slice(0, 12) : [];
 
+export async function GET(req: NextRequest) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
+
+  try {
+    await initDb();
+    const result = await db.execute("SELECT name, price, popular, description_es, description_en, features_es, features_en FROM packages ORDER BY display_order, id");
+    return NextResponse.json({ packages: result.rows.map((r) => ({
+      name: String(r.name),
+      price: String(r.price),
+      popular: Number(r.popular) === 1,
+      description: { es: String(r.description_es), en: String(r.description_en) },
+      features: { es: JSON.parse(String(r.features_es)), en: JSON.parse(String(r.features_en)) },
+    })) }, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    console.error("GET packages error:", error);
+    return NextResponse.json({ error: "Error al obtener tarifas" }, { status: 500 });
+  }
+}
+
 /** Replaces the full list of packages: body { packages: [...] }. */
 export async function PUT(req: NextRequest) {
   const denied = requireAdmin(req);

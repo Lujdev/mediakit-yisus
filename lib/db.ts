@@ -264,6 +264,7 @@ async function seed() {
     if (Number(existing.rows[0].count) > 0) return;
     const es = dictionary.es.services.packages;
     const en = dictionary.en.services.packages;
+    const prices = ["$300", "$250", "$200"];
     for (const [i, p] of es.entries()) {
       await db.execute({
         sql: `INSERT INTO packages
@@ -271,7 +272,7 @@ async function seed() {
               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
           p.name,
-          p.price,
+          prices[i],
           i === 0 ? 1 : 0,
           p.description,
           en[i].description,

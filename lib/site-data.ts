@@ -4,7 +4,6 @@ export type Brand = { id: number; name: string; url: string | null; logo: string
 export type Pkg = {
   id: number;
   name: string;
-  price: string;
   popular: boolean;
   description: { es: string; en: string };
   features: { es: string[]; en: string[] };
@@ -46,7 +45,7 @@ export async function getSiteData(): Promise<SiteData> {
     db.execute(
       "SELECT id, name, url, logo_url, logo_version, logo_data IS NOT NULL AS has_data FROM brands ORDER BY display_order, id"
     ),
-    db.execute("SELECT * FROM packages ORDER BY display_order, id"),
+    db.execute("SELECT id, name, popular, description_es, description_en, features_es, features_en FROM packages ORDER BY display_order, id"),
     db.execute("SELECT id, title, url FROM videos ORDER BY display_order, id"),
     db.execute("SELECT key, value FROM settings"),
     db.execute(
@@ -88,7 +87,6 @@ export async function getSiteData(): Promise<SiteData> {
     packages: packages.rows.map((r) => ({
       id: Number(r.id),
       name: String(r.name),
-      price: String(r.price),
       popular: Number(r.popular) === 1,
       description: { es: String(r.description_es), en: String(r.description_en) },
       features: { es: parseList(r.features_es), en: parseList(r.features_en) },

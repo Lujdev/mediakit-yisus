@@ -62,16 +62,14 @@ const es = {
   },
   services: {
     eyebrow: "Servicios",
-    title: ["TARIFAS"],
+    title: ["SERVICIOS"],
     description:
       "Paquetes base para empezar a trabajar juntos. También armamos propuestas personalizadas según tu objetivo.",
     popular: "MÁS POPULAR",
     cta: "Solicitar propuesta",
-    note: "Tarifas referenciales. Consulta propuestas personalizadas para campañas mayores.",
     packages: [
       {
         name: "Combo #1",
-        price: "$300",
         description: "Reel + TikTok + Ráfaga de 5 Stories",
         features: [
           "1 Reel profesional",
@@ -83,7 +81,6 @@ const es = {
       },
       {
         name: "Combo #2",
-        price: "$250",
         description: "Carrusel + Ráfaga de 3 Stories",
         features: [
           "1 Carrusel de 5-10 slides",
@@ -95,7 +92,6 @@ const es = {
       },
       {
         name: "Combo #3",
-        price: "$200",
         description: "TikTok + Ráfaga de 3 Stories",
         features: [
           "1 Video TikTok",
@@ -253,16 +249,14 @@ const en: Dict = {
   },
   services: {
     eyebrow: "Services",
-    title: ["RATES"],
+    title: ["SERVICES"],
     description:
       "Base packages to start working together. We also build custom proposals around your goal.",
     popular: "MOST POPULAR",
     cta: "Request a proposal",
-    note: "Reference rates. Ask for custom proposals for larger campaigns.",
     packages: [
       {
         name: "Combo #1",
-        price: "$300",
         description: "Reel + TikTok + Burst of 5 Stories",
         features: [
           "1 professional Reel",
@@ -274,7 +268,6 @@ const en: Dict = {
       },
       {
         name: "Combo #2",
-        price: "$250",
         description: "Carousel + Burst of 3 Stories",
         features: [
           "1 Carousel of 5-10 slides",
@@ -286,7 +279,6 @@ const en: Dict = {
       },
       {
         name: "Combo #3",
-        price: "$200",
         description: "TikTok + Burst of 3 Stories",
         features: [
           "1 TikTok video",
