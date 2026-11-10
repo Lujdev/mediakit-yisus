@@ -5,7 +5,6 @@ import { ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { useLang } from "../i18n/LanguageProvider";
 import { useSiteData } from "../data/SiteData";
-import Reveal from "../components/Reveal";
 import SectionHeader from "../components/SectionHeader";
 
 export default function Services() {
@@ -16,7 +15,6 @@ export default function Services() {
   const packages = data?.packages.length
     ? data.packages.map((p) => ({
         name: p.name,
-        price: p.price,
         popular: p.popular,
         description: p.description[lang],
         features: p.features[lang],
@@ -34,7 +32,7 @@ export default function Services() {
           description={t.services.description}
         />
 
-        {/* Price list: ruled rows that flood with lime on hover; the popular one is always lit. */}
+        {/* Service rows highlight the popular package by default. */}
         <ul className="border-b border-line/10">
           {packages.map((pkg, i) => {
             const lit = active === null ? pkg.popular : active === i;
@@ -91,15 +89,6 @@ export default function Services() {
                     </ul>
 
                     <div className="flex flex-col gap-5 md:items-end md:gap-6">
-                      <p
-                        className={`font-display text-8xl md:text-9xl leading-none transition-colors ${
-                          lit
-                            ? "text-on-accent"
-                            : "text-transparent [-webkit-text-stroke:1.5px_rgb(var(--text-primary)/0.55)]"
-                        }`}
-                      >
-                        {pkg.price}
-                      </p>
                       <a
                         href="#contact"
                         className={`inline-flex min-h-14 w-full items-center justify-between gap-3 whitespace-nowrap rounded-full px-7 text-base font-semibold transition-colors cursor-pointer md:min-h-12 md:w-auto md:justify-center md:px-6 ${
@@ -118,9 +107,6 @@ export default function Services() {
           })}
         </ul>
 
-        <Reveal>
-          <p className="mt-8 text-sm text-text-secondary">{t.services.note}</p>
-        </Reveal>
       </div>
     </section>
   );

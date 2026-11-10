@@ -22,7 +22,7 @@ export default function PackagesPanel() {
   const { state, run } = useAdminRequest();
 
   useEffect(() => {
-    fetch("/api/site", { cache: "no-store" })
+    fetch("/api/packages", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) =>
         setRows(
@@ -72,7 +72,7 @@ export default function PackagesPanel() {
 
   return (
     <div>
-      <PanelHeader title="Tarifas" description="Cada paquete tiene su texto en español e inglés. Las características van una por línea." />
+      <PanelHeader title="Tarifas" description="Los precios solo se muestran en el panel de administración. Cada paquete tiene su texto en español e inglés; las características van una por línea." />
 
       <div className="rounded-xl border border-line/10 px-3 md:px-5">
         {rows.map((row, i) => (
