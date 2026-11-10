@@ -125,7 +125,7 @@ function LinkCard({ video, platform }: { video: Video; platform: string }) {
   );
 }
 
-function VideoCard({ video }: { video: Video }) {
+export function VideoCard({ video }: { video: Video }) {
   const kind = classify(video.url);
 
   return (

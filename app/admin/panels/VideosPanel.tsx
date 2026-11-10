@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2, Upload } from "lucide-react";
 import { AuthLostContext, Button, Field, FilePicker, PanelHeader, StatusText, inputClass, json, move, useAdminRequest } from "../ui";
 
-type Row = { key: number; title: string; url: string };
+type Row = { key: number; title: string; url: string; brandId: number | null };
 let nextKey = 1;
 
 const MAX_BYTES = 100 * 1024 * 1024;
@@ -45,6 +45,7 @@ function uploadToCloudinary(
 
 export default function VideosPanel() {
   const [rows, setRows] = useState<Row[]>([]);
+  const [brands, setBrands] = useState<{ id: number; name: string }[]>([]);
   const { state, run } = useAdminRequest();
   const authLost = useContext(AuthLostContext);
   const [progress, setProgress] = useState<number | null>(null);
@@ -64,7 +65,7 @@ export default function VideosPanel() {
       const sig = await res.json();
       if (!res.ok) throw new Error(sig.error ?? "No se pudo preparar la subida");
       const url = await uploadToCloudinary(file, sig, setProgress);
-      setRows((r) => [...r, { key: nextKey++, title: file.name.replace(/\.[^.]+$/, ""), url: deliveryUrl(url) }]);
+      setRows((r) => [...r, { key: nextKey++, title: file.name.replace(/\.[^.]+$/, ""), url: deliveryUrl(url), brandId: null }]);
       setUploaded(true);
       setFileKey((k) => k + 1);
     } catch (err) {
@@ -77,9 +78,10 @@ export default function VideosPanel() {
   useEffect(() => {
     fetch("/api/site", { cache: "no-store" })
       .then((r) => r.json())
-      .then((d) =>
-        setRows((d.videos ?? []).map((v: { title: string; url: string }) => ({ key: nextKey++, title: v.title, url: v.url })))
-      )
+      .then((d) => {
+        setBrands(d.brands ?? []);
+        setRows((d.videos ?? []).map((v: { title: string; url: string; brandId: number | null }) => ({ key: nextKey++, title: v.title, url: v.url, brandId: v.brandId ?? null })));
+      })
       .catch(() => {});
   }, []);
 
@@ -90,7 +92,7 @@ export default function VideosPanel() {
     <div>
       <PanelHeader
         title="Videos"
-        description="Sube un video (hasta 100 MB) o pega un enlace de YouTube, TikTok o Instagram. Sin videos, la sección no se muestra."
+        description="Sube un video (hasta 100 MB) o pega un enlace de YouTube, TikTok o Instagram. Puedes asociarlo a una marca. Sin videos, la sección no se muestra."
       />
 
       <div className="space-y-4">
@@ -110,6 +112,12 @@ export default function VideosPanel() {
                 />
               </Field>
             </div>
+            <Field label="Marca (opcional)">
+              <select value={row.brandId ?? ""} onChange={(e) => update(i, { brandId: e.target.value ? Number(e.target.value) : null })} className={inputClass}>
+                <option value="">Sin marca</option>
+                {brands.map((brand) => <option key={brand.id} value={brand.id}>{brand.name}</option>)}
+              </select>
+            </Field>
             <div className="flex flex-wrap gap-2">
               <Button variant="ghost" aria-label="Subir" disabled={i === 0} onClick={() => setRows(move(rows, i, i - 1))}>
                 <ArrowUp size={16} aria-hidden />
@@ -145,12 +153,12 @@ export default function VideosPanel() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <Button variant="ghost" onClick={() => setRows([...rows, { key: nextKey++, title: "", url: "" }])}>
+        <Button variant="ghost" onClick={() => setRows([...rows, { key: nextKey++, title: "", url: "", brandId: null }])}>
           <Plus size={16} aria-hidden /> Agregar video
         </Button>
         <Button
           disabled={state.kind === "saving"}
-          onClick={() => run("/api/videos", json("PUT", { videos: rows.map(({ title, url }) => ({ title, url })) }))}
+          onClick={() => run("/api/videos", json("PUT", { videos: rows.map(({ title, url, brandId }) => ({ title, url, brandId })) }))}
         >
           {state.kind === "saving" ? "Guardando..." : "Guardar videos"}
         </Button>

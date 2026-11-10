@@ -117,6 +117,13 @@ async function createSchema() {
     )
   `);
 
+  // Existing databases predate brand associations. Ignore only a concurrent duplicate-column migration.
+  try {
+    await db.execute("ALTER TABLE videos ADD COLUMN brand_id INTEGER REFERENCES brands(id) ON DELETE SET NULL");
+  } catch (error) {
+    if (!String(error).toLowerCase().includes("duplicate column name")) throw error;
+  }
+
   await db.execute(`
     CREATE TABLE IF NOT EXISTS visits (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
