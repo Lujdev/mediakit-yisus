@@ -8,7 +8,7 @@ export type Pkg = {
   description: { es: string; en: string };
   features: { es: string[]; en: string[] };
 };
-export type Video = { id: number; title: string; url: string };
+export type Video = { id: number; title: string; url: string; brandId: number | null };
 export type MediaItem = {
   id: number;
   src: string;
@@ -46,7 +46,7 @@ export async function getSiteData(): Promise<SiteData> {
       "SELECT id, name, url, logo_url, logo_version, logo_data IS NOT NULL AS has_data FROM brands ORDER BY display_order, id"
     ),
     db.execute("SELECT id, name, popular, description_es, description_en, features_es, features_en FROM packages ORDER BY display_order, id"),
-    db.execute("SELECT id, title, url FROM videos ORDER BY display_order, id"),
+    db.execute("SELECT id, title, url, brand_id FROM videos ORDER BY display_order, id"),
     db.execute("SELECT key, value FROM settings"),
     db.execute(
       `SELECT id, kind, group_key, url, version, category, focal, alt_es, alt_en, data IS NOT NULL AS has_data
@@ -95,6 +95,7 @@ export async function getSiteData(): Promise<SiteData> {
       id: Number(r.id),
       title: String(r.title),
       url: String(r.url),
+      brandId: r.brand_id == null ? null : Number(r.brand_id),
     })),
     settings: {
       ...DEFAULT_SETTINGS,

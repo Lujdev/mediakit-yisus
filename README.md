@@ -47,7 +47,7 @@ MediaKit web interactivo y de alto impacto visual para **Yisus Contreras** (@yis
 - Pestañas: Métricas, Visitas, Marcas (logos), Tarifas (ES/EN), Videos, Redes, Mensajes.
 - Visitas: guarda IP, ubicación aproximada (país y ciudad, la resuelve Vercel a partir de la IP, sin servicios de terceros), dispositivo, navegador, idioma y origen **30 días** (se borran solas: al arrancar, en cada visita con baja probabilidad, al abrir la pestaña y con un cron diario en `vercel.json`). Origen por red: enlaces cortos `/go/<código>` (código neutro, editable desde la pestaña; redirigen a la página limpia y recuerdan la red 30 min por cookie; también se entiende `?utm_source=`), referrer y navegador interno de la app; sin ninguna señal cuenta como Directo. No cuenta bots, recargas repetidas (misma persona dentro de 15 min; si vuelve después, cuenta como visita nueva) ni los dispositivos donde inicias sesión en el admin.
 - Logos: al subir una imagen con fondo blanco, el fondo se elimina automáticamente (`lib/logo.ts`). El sitio los muestra en blanco.
-- Videos: enlaces de YouTube (se reproducen en el sitio), TikTok/Instagram (abren en su app) o `.mp4` directo. Sin videos, la sección no aparece.
+- Videos: enlaces de YouTube (se reproducen en el sitio), TikTok/Instagram (abren en su app) o `.mp4` directo. En la pestaña Videos se puede asociar cada video a una marca; al seleccionar esa marca en la marquesina se muestran sus videos. Sin videos, la sección no aparece.
 - Contenido editable (marcas, tarifas, redes, videos) vive en la base de datos (Turso en producción) y se siembra con valores por defecto la primera vez.
 
 ## Scripts

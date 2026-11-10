@@ -107,6 +107,9 @@ const es = {
     eyebrow: "Confían en mí",
     title: ["MARCAS"],
     description: "Colaboraciones que reflejan versatilidad, estilo y resultados.",
+    videoHint: "Selecciona una marca para ver sus videos.",
+    videoLabel: "videos",
+    videoHeading: "Videos de",
   },
   gallery: {
     eyebrow: "Portafolio",
@@ -294,6 +297,9 @@ const en: Dict = {
     eyebrow: "They trust me",
     title: ["BRANDS"],
     description: "Collaborations that reflect versatility, style and results.",
+    videoHint: "Select a brand to see its videos.",
+    videoLabel: "videos",
+    videoHeading: "Videos by",
   },
   gallery: {
     eyebrow: "Portfolio",
